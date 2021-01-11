@@ -1,3 +1,3 @@
 # Pictionary
 
-Pictionary for 4 people
+Pictionary for 4 players 
