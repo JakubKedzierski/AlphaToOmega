@@ -31,15 +31,6 @@ public class PictionaryServer implements Runnable {
 		new PictionaryServer();
 
 	}
-	
-	private ClientHandler getClientHandlerById(final String id) {
-		for(ClientHandler handler:users) {
-			if(handler.getUserId()==id) {
-				return handler;
-			}
-		}
-		return null;
-	}
 
 
 	public void run() {
@@ -66,7 +57,19 @@ public class PictionaryServer implements Runnable {
 		}
 		
 	}
-
+	
+	public ClientHandler getClientHandlerById(final String id) {
+		for(ClientHandler handler:users) {
+			if(handler.getUserId()==id) {
+				return handler;
+			}
+		}
+		return null;
+	}
+	
+	public void addClientHandler(ClientHandler clientHandler) {
+		users.add(clientHandler);
+	}
 
 	public void removeHandler(ClientHandler clientHandler) {
 		users.remove(clientHandler);
