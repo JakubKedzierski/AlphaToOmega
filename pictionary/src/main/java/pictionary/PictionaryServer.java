@@ -1,65 +1,206 @@
 package pictionary;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 public class PictionaryServer implements Runnable {
-	public static int SERVER_PORT=25000;
-	Map<ClientHandler, Integer> map=new HashMap<ClientHandler, Integer>();
-	int userCount=0;
-	
-	
-	PictionaryServer(){
+	public static int SERVER_PORT = 25000;
+	private List<ClientHandler> users = new ArrayList<ClientHandler>();
+	private int userCount = 0;
+
+	public PictionaryServer() {
 		new Thread(this).start();
 	}
-	
-	
+
 	public static void main(String[] args) {
 		new PictionaryServer();
 
 	}
 
-
 	public void run() {
 		try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
-			int port=serverSocket.getLocalPort();
-			String address=InetAddress.getLocalHost().getHostAddress();
-			System.out.println("Server starts on port  "+ port);
-			System.out.println("Host address: "+ address);
-			
-			while(userCount<4) {
+			int port = serverSocket.getLocalPort();
+			String address = InetAddress.getLocalHost().getHostAddress();
+			System.out.println("Server starts on port  " + port);
+			System.out.println("Host address: " + address);
+
+			while (userCount < 4) {
 				Socket clientSocket = serverSocket.accept();
-				if(clientSocket!=null) {
-					newConnectionStartup(clientSocket);
+				if (clientSocket != null) {
+					ClientHandler userHandler = new ClientHandler(this, clientSocket);
+					users.add(userHandler);
+					userCount++;
 				}
-				
+
 			}
-			
-			while(true) {}  // to keep thread alive
-			
-		}catch(IOException ioException) {
+
+			while (true) {
+			} // to keep thread alive
+
+		} catch (IOException ioException) {
 			System.out.println("Issues with listening thread");
 		}
-		
+
 	}
-		
-	private void newConnectionStartup(Socket clientSocket) {
-		
+
+	public ClientHandler getClientHandlerById(final String id) {
+		for (ClientHandler handler : users) {
+			if (handler.getUserId() == id) {
+				return handler;
+			}
+		}
+		return null;
 	}
-	
+
+	public boolean isNameTaken(String userName) {
+		for (ClientHandler handler : users) {
+			if (userName.equals(handler.getUserId())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public void addClientHandler(ClientHandler clientHandler) {
+		users.add(clientHandler);
+	}
+
+	public void removeHandler(ClientHandler clientHandler) {
+		users.remove(clientHandler);
+		userCount--;
+	}
 
 }
 
+@EqualsAndHashCode
+class ClientHandler implements Runnable {
 
-class ClientHandler{
-	int userId;
-	
-	ClientHandler(){
-		
+	private @Getter @Setter String userId = null;
+
+	private PictionaryServer server = null;
+	private Socket socket = null;
+	private ObjectInputStream inputStream = null;
+	private ObjectOutputStream outputStream = null;
+
+	ClientHandler(PictionaryServer server, Socket socket) {
+		this.server = server;
+		this.socket = socket;
+		new Thread(this).start();
 	}
-	
+
+	@Override
+	public void run() {
+		try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+				ObjectInputStream input = new ObjectInputStream(socket.getInputStream());) {
+
+			outputStream = output;
+			inputStream = input;
+
+			String message = (String) input.readObject();
+
+			if (message != null) {
+				try {
+					newConnectionStartup(message);
+				} catch (IOException fatalException) {
+					server.removeHandler(this);
+					return;
+				}
+			}
+
+			// sending host/player info
+
+			while (true) {
+				message = (String) input.readObject();
+
+			}
+
+		} catch (Exception exception) {
+			System.out.println("Client connecetion failed");
+			server.removeHandler(this);
+			return;
+		}
+
+	}
+
+	public void nameValidation(String userDeclaredName) throws PictionaryServerException, IOException {
+		while (server.isNameTaken(userDeclaredName)) {
+
+			sendMessageFromServerToClient("Error", "NameValidation");
+
+			try {
+				userDeclaredName = (String) inputStream.readObject();
+			} catch (ClassNotFoundException exception) {
+				System.out.println("Name validation went wrong");
+			}
+
+		}
+
+		userId = userDeclaredName;
+	}
+
+	private void newConnectionStartup(String message) throws PictionaryServerException, IOException {
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		JsonNode greetingMessage = mapper.readTree(message);
+		if (greetingMessage.has("name")) {
+
+			String userDeclaredName = greetingMessage.path("name").asText();
+			nameValidation(userDeclaredName);
+
+		} else {
+			throw new PictionaryServerException("Message dosent contain name attribute.");
+		}
+
+	}
+
+	public void sendMessageFromServerToClient(String messageType, String message) throws PictionaryServerException {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode node = mapper.createObjectNode();
+			((ObjectNode) node).put("sender", "server");
+			((ObjectNode) node).put("messageType", messageType);
+			((ObjectNode) node).put("message", message);
+			String nameValidationMessage = mapper.writeValueAsString(node);
+			sendMessageToClient(nameValidationMessage);
+
+		} catch (JsonProcessingException exception) {
+			System.out.println("JSON wrapping went wrong");
+			throw new PictionaryServerException();
+		}
+	}
+
+	public void sendMessageToClient(String message) throws PictionaryServerException {
+		try {
+			outputStream.writeObject(message);
+		} catch (IOException exception) {
+			throw new PictionaryServerException("Server failed, connection lost");
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "Handler of" + userId + "\n";
+
+	}
+
 }
