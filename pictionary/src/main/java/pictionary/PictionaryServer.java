@@ -88,6 +88,15 @@ public class PictionaryServer implements Runnable {
 		users.remove(clientHandler);
 		userCount--;
 	}
+	
+	public ArrayList<String> getUsersIdList() {
+		ArrayList<String> nameList=new ArrayList<String>();
+		for(ClientHandler handler:users) {
+			String name=handler.getUserId();
+			nameList.add(name);
+		}
+		return nameList;
+	}
 
 }
 
