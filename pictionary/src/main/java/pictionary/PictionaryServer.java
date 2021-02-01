@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -23,7 +24,7 @@ import lombok.Setter;
 
 public class PictionaryServer implements Runnable {
 	public static int SERVER_PORT = 25000;
-	private List<ClientHandler> users = new ArrayList<ClientHandler>();
+	private ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
 	private int userCount = 0;
 
 	public PictionaryServer() {
@@ -45,6 +46,7 @@ public class PictionaryServer implements Runnable {
 			while (userCount < 4) {
 				Socket clientSocket = serverSocket.accept();
 				if (clientSocket != null) {
+					System.out.println("Connection accepted");
 					ClientHandler userHandler = new ClientHandler(this, clientSocket);
 					users.add(userHandler);
 					userCount++;
@@ -73,11 +75,15 @@ public class PictionaryServer implements Runnable {
 	public boolean isNameTaken(String userName) {
 		for (ClientHandler handler : users) {
 			if (userName.equals(handler.getUserId())) {
-				return false;
+				return true;
 			}
 		}
 
-		return true;
+		return false;
+	}
+
+	public int users() {
+		return users.size();
 	}
 
 	public void addClientHandler(ClientHandler clientHandler) {
@@ -87,6 +93,15 @@ public class PictionaryServer implements Runnable {
 	public void removeHandler(ClientHandler clientHandler) {
 		users.remove(clientHandler);
 		userCount--;
+	}
+
+	public ArrayList<String> getUsersIdList() {
+		ArrayList<String> nameList = new ArrayList<String>();
+		for (ClientHandler handler : users) {
+			String name = handler.getUserId();
+			nameList.add(name);
+		}
+		return nameList;
 	}
 
 }
@@ -112,10 +127,11 @@ class ClientHandler implements Runnable {
 		try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream input = new ObjectInputStream(socket.getInputStream());) {
 
+			System.out.println("Client handler starts");
 			outputStream = output;
 			inputStream = input;
 
-			String message = (String) input.readObject();
+			String message = (String) inputStream.readObject();
 
 			if (message != null) {
 				try {
@@ -125,8 +141,6 @@ class ClientHandler implements Runnable {
 					return;
 				}
 			}
-
-			// sending host/player info
 
 			while (true) {
 				message = (String) input.readObject();
@@ -165,8 +179,21 @@ class ClientHandler implements Runnable {
 		if (greetingMessage.has("name")) {
 
 			String userDeclaredName = greetingMessage.path("name").asText();
-			nameValidation(userDeclaredName);
 
+			if (server.isNameTaken(userDeclaredName)) {
+				sendMessageFromServerToClient("Error", "NameValidation");
+				
+				try {
+					String userNewName;
+					userNewName = (String) inputStream.readObject();
+					newConnectionStartup(userNewName);
+				} catch (ClassNotFoundException e) {
+					throw new PictionaryServerException("Name validation exception");
+				}
+				
+			} else {
+				userId = userDeclaredName;
+			}
 		} else {
 			throw new PictionaryServerException("Message dosent contain name attribute.");
 		}
