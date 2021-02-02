@@ -1,5 +1,8 @@
 package pictionary;
 
+import client_side.PictionaryClient;
+import server_side.PictionaryServer;
+
 public class ConnectionTest {
 
 	public static void main(String[] args) {

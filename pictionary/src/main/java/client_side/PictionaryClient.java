@@ -1,4 +1,4 @@
-package pictionary;
+package client_side;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -121,8 +120,6 @@ public class PictionaryClient implements Runnable {
 
 		} catch (JsonProcessingException exception) {
 			System.out.println("JSON wrapping went wrong");
-			throw new PictionaryClientException();
-		} catch (IOException e) {
 			throw new PictionaryClientException();
 		}
 	}

@@ -3,7 +3,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import client_side.PictionaryClient;
 import pictionary.*;
+import server_side.PictionaryServer;
 
 
 public class PictionaryServerTest {

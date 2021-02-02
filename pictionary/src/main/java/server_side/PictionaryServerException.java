@@ -1,4 +1,4 @@
-package pictionary;
+package server_side;
 
 public class PictionaryServerException extends Exception{
 

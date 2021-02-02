@@ -1,4 +1,4 @@
-package pictionary;
+package server_side;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,19 +8,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import client_side.PictionaryClientException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import pictionary.pictionaryProtocolParser;
 
 public class PictionaryServer implements Runnable {
 	public static int SERVER_PORT = 25000;
@@ -144,9 +145,10 @@ class ClientHandler implements Runnable {
 
 			while (true) {
 				message = (String) input.readObject();
-
+				parseProtocolMessage(message);
 			}
 
+			
 		} catch (Exception exception) {
 			System.out.println("Client connecetion failed");
 			server.removeHandler(this);
@@ -221,6 +223,14 @@ class ClientHandler implements Runnable {
 			outputStream.writeObject(message);
 		} catch (IOException exception) {
 			throw new PictionaryServerException("Server failed, connection lost");
+		}
+	}
+	
+	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryServerException {
+		HashMap<String, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
+		
+		if(messageInfo.get("receiver").equals("server")) {
+			// do server stuff
 		}
 	}
 
