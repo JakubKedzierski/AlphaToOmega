@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.Getter;
 import lombok.Setter;
+import pictionary.pictionaryProtocolParser;
 
 public class PictionaryClient implements Runnable {
 
@@ -43,6 +45,7 @@ public class PictionaryClient implements Runnable {
 			inputStream = new ObjectInputStream(socket.getInputStream());
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			sendNameToServer(name);
+			
 
 			while (true) {
 				String plainMessage;
@@ -73,9 +76,9 @@ public class PictionaryClient implements Runnable {
 	}
 
 	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryClientException {
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode message = mapper.readTree(plainMessage);
-		String messageType = message.path("messageType").asText();
+		HashMap<String, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
+		String messageType = messageInfo.get("messageType");
+		
 		switch (messageType) {
 		
 		case "chat":
@@ -88,7 +91,7 @@ public class PictionaryClient implements Runnable {
 			break;
 
 		case "Error":
-			if (message.path("message").asText().equals("NameValidation")) {
+			if (messageInfo.get("message").equals("NameValidation")) {
 				resolveNameValidation();
 			}
 
@@ -111,24 +114,14 @@ public class PictionaryClient implements Runnable {
 	}
 
 	public void sendNameToServer(String name) throws PictionaryClientException {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode node = mapper.createObjectNode();
-			((ObjectNode) node).put("name", name);
-			String nameValidationMessage = mapper.writeValueAsString(node);
-			sendMessageToServer(nameValidationMessage);
-
-		} catch (JsonProcessingException exception) {
-			System.out.println("JSON wrapping went wrong");
-			throw new PictionaryClientException();
-		}
+		sendMessage("NameValidation",name,"server");
 	}
 
 	public void sendMessage(String messageType, String message, String receiver) throws PictionaryClientException {
-		final String[] dataTypes = { "chat", "pixelVector", "guessedWord", "Error" };
+		final String[] dataTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation" };
 
 		if (!Arrays.stream(dataTypes).anyMatch(messageType::equals)) {
-			return;
+			throw new IllegalArgumentException("Wrong message type");
 		}
 
 		try {

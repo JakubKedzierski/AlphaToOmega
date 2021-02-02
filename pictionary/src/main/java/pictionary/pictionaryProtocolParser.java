@@ -13,7 +13,7 @@ import lombok.Getter;
 
 public final class pictionaryProtocolParser {
 	private static final @Getter String[] protocolPool = { "sender" , "receiver" , "messageType", "message"};
-	private static final @Getter String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error" };
+	private static final @Getter String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation" };
 	
 	
 	public static HashMap<String, String> parseProtocol(String jsonMessage) throws JacksonException {

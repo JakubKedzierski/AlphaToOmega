@@ -131,7 +131,6 @@ class ClientHandler implements Runnable {
 			System.out.println("Client handler starts");
 			outputStream = output;
 			inputStream = input;
-
 			String message = (String) inputStream.readObject();
 
 			if (message != null) {
@@ -176,11 +175,10 @@ class ClientHandler implements Runnable {
 	private void newConnectionStartup(String message) throws PictionaryServerException, IOException {
 
 		ObjectMapper mapper = new ObjectMapper();
-
 		JsonNode greetingMessage = mapper.readTree(message);
-		if (greetingMessage.has("name")) {
+		if (greetingMessage.path("messageType").asText().equals("NameValidation")) {
 
-			String userDeclaredName = greetingMessage.path("name").asText();
+			String userDeclaredName = greetingMessage.path("message").asText();
 
 			if (server.isNameTaken(userDeclaredName)) {
 				sendMessageFromServerToClient("Error", "NameValidation");
@@ -207,6 +205,7 @@ class ClientHandler implements Runnable {
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode node = mapper.createObjectNode();
 			((ObjectNode) node).put("sender", "server");
+			((ObjectNode) node).put("receiver", "client");
 			((ObjectNode) node).put("messageType", messageType);
 			((ObjectNode) node).put("message", message);
 			String nameValidationMessage = mapper.writeValueAsString(node);

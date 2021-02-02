@@ -13,7 +13,7 @@ public class ConnectionTest {
 			Thread.sleep(400);
 			new PictionaryClient("test2");
 			Thread.sleep(400);
-			new PictionaryClient("test3");
+			new PictionaryClient("test2");
 			Thread.sleep(400);
 			new PictionaryClient("test4");
 
