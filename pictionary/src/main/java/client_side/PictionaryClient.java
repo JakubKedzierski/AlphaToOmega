@@ -25,10 +25,10 @@ public class PictionaryClient implements Runnable {
 	public static int SERVER_PORT = 25000;
 
 	private @Getter @Setter String name;
-	private Socket socket = null;
-	private ObjectInputStream inputStream = null;
-	private ObjectOutputStream outputStream = null;
-	private boolean connected = false;
+	private @Getter Socket socket = null;
+	private @Getter ObjectInputStream inputStream = null;
+	private @Getter ObjectOutputStream outputStream = null;
+	private @Getter boolean connected = false;
 
 	public static void main(String[] args) {
 		new PictionaryClient("test");
@@ -70,14 +70,15 @@ public class PictionaryClient implements Runnable {
 			return;
 
 		} catch (IOException e) {
-			if(!connected) {
+			if (!connected) {
 				System.out.println("Client " + name + " disconected");
 				return;
-			}else {
+			} else {
 				try {
 					disconnect();
 					System.out.println("Client " + name + " disconected");
-				} catch (Exception e1) {}
+				} catch (Exception e1) {
+				}
 				return;
 			}
 
@@ -97,6 +98,7 @@ public class PictionaryClient implements Runnable {
 		switch (messageType) {
 
 		case "chat":
+			receivedMessage(messageInfo.get(pictionaryProtocolPool.MESSAGE));
 			break;
 
 		case "pixelVector":
@@ -164,10 +166,16 @@ public class PictionaryClient implements Runnable {
 
 	public void disconnect() throws PictionaryClientException, IOException {
 		sendMessage("Error", "disconected", "server");
-		if(socket!=null) socket.close();
-		if(inputStream!=null) inputStream.close();
-		if(outputStream!=null) outputStream.close();
+		if (socket != null)
+			socket.close();
+		if (inputStream != null)
+			inputStream.close();
+		if (outputStream != null)
+			outputStream.close();
 		connected = false;
 	}
 
+	public void receivedMessage(String message) {
+		System.out.println("otrzymalem wiadomosc "+ name + " " +  message);
+	}
 }

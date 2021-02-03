@@ -12,15 +12,16 @@ public class pictionaryDriver {
 		new PictionaryServer();
 		try {
 			Thread.sleep(1000);
-			new PictionaryClient("test1");
+			PictionaryClient client1=  new PictionaryClient("test1");
 			Thread.sleep(400);
-			new PictionaryClient("test2");
+			PictionaryClient client2=new PictionaryClient("test2");
 			Thread.sleep(400);
-			new PictionaryClient("test2");
+			PictionaryClient client3=new PictionaryClient("test3");
 			Thread.sleep(400);
-			PictionaryClient client = new PictionaryClient("test4");
+			PictionaryClient client4 = new PictionaryClient("test4");
 			Thread.sleep(400);
-			client.disconnect();
+			client4.disconnect();
+			client1.sendMessage("chat", "test message", "broadcast");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (PictionaryClientException e) {
@@ -30,6 +31,7 @@ public class pictionaryDriver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 }

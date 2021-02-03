@@ -112,7 +112,7 @@ class ClientHandler implements Runnable {
 	private @Getter @Setter String userId = null;
 
 	private PictionaryServer server = null;
-	private Socket socket = null;
+	private @Getter Socket socket = null;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
 	private boolean connected = false;
@@ -240,6 +240,7 @@ class ClientHandler implements Runnable {
 				for (ClientHandler handler : server.getUsers()) {
 					if (!handler.equals(this)) {
 						handler.sendMessageToClient(plainMessage);
+						
 					}
 				}
 			} else if (receiver.equals("server")) {
@@ -256,9 +257,11 @@ class ClientHandler implements Runnable {
 					}
 				}
 			}
+			
 		}
-
+	
 	}
+
 
 	public void diconnectClient() throws IOException {
 		if (socket != null)
