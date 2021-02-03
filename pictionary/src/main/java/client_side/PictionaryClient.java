@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import pictionary.pictionaryProtocolParser;
+import pictionary.pictionaryProtocolPool;
 
 public class PictionaryClient implements Runnable {
 
@@ -27,6 +28,7 @@ public class PictionaryClient implements Runnable {
 	private Socket socket = null;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
+	private boolean connected = false;
 
 	public static void main(String[] args) {
 		new PictionaryClient("test");
@@ -44,10 +46,14 @@ public class PictionaryClient implements Runnable {
 			socket = new Socket(SERVER_NAME, SERVER_PORT);
 			inputStream = new ObjectInputStream(socket.getInputStream());
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
+			connected = true;
 			sendNameToServer(name);
-			
 
 			while (true) {
+				if (!connected) {
+					System.out.println("Client " + name + "disconected");
+					return;
+				}
 				String plainMessage;
 				plainMessage = (String) inputStream.readObject();
 
@@ -64,7 +70,16 @@ public class PictionaryClient implements Runnable {
 			return;
 
 		} catch (IOException e) {
-			System.out.println("Failed to connect with server");
+			if(!connected) {
+				System.out.println("Client " + name + " disconected");
+				return;
+			}else {
+				try {
+					disconnect();
+					System.out.println("Client " + name + " disconected");
+				} catch (Exception e1) {}
+				return;
+			}
 
 		} catch (ClassNotFoundException e) {
 			System.out.println("Wrong data type during comunication");
@@ -76,11 +91,11 @@ public class PictionaryClient implements Runnable {
 	}
 
 	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryClientException {
-		HashMap<String, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
-		String messageType = messageInfo.get("messageType");
-		
+		HashMap<pictionaryProtocolPool, String> messageInfo = pictionaryProtocolParser.parseProtocol(plainMessage);
+		String messageType = messageInfo.get(pictionaryProtocolPool.MESSAGETYPE);
+
 		switch (messageType) {
-		
+
 		case "chat":
 			break;
 
@@ -91,7 +106,7 @@ public class PictionaryClient implements Runnable {
 			break;
 
 		case "Error":
-			if (messageInfo.get("message").equals("NameValidation")) {
+			if (messageInfo.get(pictionaryProtocolPool.MESSAGE).equals("NameValidation")) {
 				resolveNameValidation();
 			}
 
@@ -114,7 +129,7 @@ public class PictionaryClient implements Runnable {
 	}
 
 	public void sendNameToServer(String name) throws PictionaryClientException {
-		sendMessage("NameValidation",name,"server");
+		sendMessage("NameValidation", name, "server");
 	}
 
 	public void sendMessage(String messageType, String message, String receiver) throws PictionaryClientException {
@@ -139,12 +154,20 @@ public class PictionaryClient implements Runnable {
 		}
 	}
 
-	public void sendMessageToServer(String message) throws PictionaryClientException {
+	private void sendMessageToServer(String message) throws PictionaryClientException {
 		try {
 			outputStream.writeObject(message);
 		} catch (IOException e) {
 			throw new PictionaryClientException("Message sending failed");
 		}
+	}
+
+	public void disconnect() throws PictionaryClientException, IOException {
+		sendMessage("Error", "disconected", "server");
+		if(socket!=null) socket.close();
+		if(inputStream!=null) inputStream.close();
+		if(outputStream!=null) outputStream.close();
+		connected = false;
 	}
 
 }

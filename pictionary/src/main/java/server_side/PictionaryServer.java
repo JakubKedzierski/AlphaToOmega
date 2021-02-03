@@ -10,18 +10,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import client_side.PictionaryClientException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import pictionary.pictionaryProtocolParser;
+import pictionary.pictionaryProtocolPool;
 
 public class PictionaryServer implements Runnable {
 	public static int SERVER_PORT = 25000;
@@ -60,6 +58,7 @@ public class PictionaryServer implements Runnable {
 
 		} catch (IOException ioException) {
 			System.out.println("Issues with listening thread");
+			return;
 		}
 
 	}
@@ -116,6 +115,7 @@ class ClientHandler implements Runnable {
 	private Socket socket = null;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
+	private boolean connected=false;
 
 	ClientHandler(PictionaryServer server, Socket socket) {
 		this.server = server;
@@ -127,7 +127,8 @@ class ClientHandler implements Runnable {
 	public void run() {
 		try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream input = new ObjectInputStream(socket.getInputStream());) {
-
+			
+			connected=true;
 			System.out.println("Client handler starts");
 			outputStream = output;
 			inputStream = input;
@@ -145,6 +146,11 @@ class ClientHandler implements Runnable {
 			while (true) {
 				message = (String) input.readObject();
 				parseProtocolMessage(message);
+				
+				if(!connected) {
+					System.out.println("Client handler exits");
+					return;
+				}
 			}
 
 			
@@ -174,11 +180,11 @@ class ClientHandler implements Runnable {
 
 	private void newConnectionStartup(String message) throws PictionaryServerException, IOException {
 
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode greetingMessage = mapper.readTree(message);
-		if (greetingMessage.path("messageType").asText().equals("NameValidation")) {
+		HashMap<pictionaryProtocolPool, String> messageInfo=pictionaryProtocolParser.parseProtocol(message);
 
-			String userDeclaredName = greetingMessage.path("message").asText();
+		if (messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
+
+			String userDeclaredName = messageInfo.get(pictionaryProtocolPool.MESSAGE);
 
 			if (server.isNameTaken(userDeclaredName)) {
 				sendMessageFromServerToClient("Error", "NameValidation");
@@ -225,12 +231,25 @@ class ClientHandler implements Runnable {
 		}
 	}
 	
-	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryServerException {
-		HashMap<String, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
+	public void parseProtocolMessage(String plainMessage) throws PictionaryServerException, IOException {
+		HashMap<pictionaryProtocolPool, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
 		
-		if(messageInfo.get("receiver").equals("server")) {
-			// do server stuff
+		if(messageInfo.get(pictionaryProtocolPool.RECEIVER).equals("server")) {
+			if(messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
+				
+				if(messageInfo.get(pictionaryProtocolPool.MESSAGE).equals("disconected")) {
+					diconnectClient();
+				}
+			}
 		}
+	}
+	
+	public void diconnectClient() throws IOException {
+		if(socket!=null) socket.close();
+		if(inputStream!=null) inputStream.close();
+		if(outputStream!=null) outputStream.close();
+		server.removeHandler(this);
+		connected=false;
 	}
 
 	@Override

@@ -12,12 +12,12 @@ import lombok.Getter;
 
 
 public final class pictionaryProtocolParser {
-	private static final @Getter String[] protocolPool = { "sender" , "receiver" , "messageType", "message"};
-	private static final @Getter String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation" };
+	private static final String[] protocolPool = { "sender" , "receiver" , "messageType", "message"};
+	private static final String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation" };
 	
 	
-	public static HashMap<String, String> parseProtocol(String jsonMessage) throws JacksonException {
-		HashMap<String, String> parsedMessage=new HashMap<String, String>();
+	public static HashMap<pictionaryProtocolPool, String> parseProtocol(String jsonMessage) throws JacksonException {
+		HashMap<pictionaryProtocolPool, String> parsedMessage=new HashMap<pictionaryProtocolPool, String>();
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
@@ -36,10 +36,10 @@ public final class pictionaryProtocolParser {
 			
 		}
 		
-		parsedMessage.put("sender", messageNode.path("sender").asText());
-		parsedMessage.put("receiver", messageNode.path("receiver").asText());
-		parsedMessage.put("messageType", messageNode.path("messageType").asText());
-		parsedMessage.put("message", messageNode.path("message").asText());
+		parsedMessage.put(pictionaryProtocolPool.SENDER, messageNode.path("sender").asText());
+		parsedMessage.put(pictionaryProtocolPool.RECEIVER, messageNode.path("receiver").asText());
+		parsedMessage.put(pictionaryProtocolPool.MESSAGETYPE, messageNode.path("messageType").asText());
+		parsedMessage.put(pictionaryProtocolPool.MESSAGE, messageNode.path("message").asText());
 		
 		return parsedMessage;
 		

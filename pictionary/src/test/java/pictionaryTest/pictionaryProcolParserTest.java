@@ -50,8 +50,7 @@ public class pictionaryProcolParserTest {
 			e.printStackTrace();
 		}
 		checkedMessage = checkedMessage + "testMessage312312";
-		Map<String, String> testMap;
-		testMap = pictionaryProtocolParser.parseProtocol(checkedMessage);
+		pictionaryProtocolParser.parseProtocol(checkedMessage);
 
 	}
 
