@@ -23,7 +23,7 @@ import pictionary.pictionaryProtocolPool;
 
 public class PictionaryServer implements Runnable {
 	public static int SERVER_PORT = 25000;
-	private ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
+	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
 	private int userCount = 0;
 
 	public PictionaryServer() {
@@ -115,7 +115,7 @@ class ClientHandler implements Runnable {
 	private Socket socket = null;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
-	private boolean connected=false;
+	private boolean connected = false;
 
 	ClientHandler(PictionaryServer server, Socket socket) {
 		this.server = server;
@@ -127,8 +127,8 @@ class ClientHandler implements Runnable {
 	public void run() {
 		try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream input = new ObjectInputStream(socket.getInputStream());) {
-			
-			connected=true;
+
+			connected = true;
 			System.out.println("Client handler starts");
 			outputStream = output;
 			inputStream = input;
@@ -146,14 +146,13 @@ class ClientHandler implements Runnable {
 			while (true) {
 				message = (String) input.readObject();
 				parseProtocolMessage(message);
-				
-				if(!connected) {
+
+				if (!connected) {
 					System.out.println("Client handler exits");
 					return;
 				}
 			}
 
-			
 		} catch (Exception exception) {
 			System.out.println("Client connecetion failed");
 			server.removeHandler(this);
@@ -180,7 +179,7 @@ class ClientHandler implements Runnable {
 
 	private void newConnectionStartup(String message) throws PictionaryServerException, IOException {
 
-		HashMap<pictionaryProtocolPool, String> messageInfo=pictionaryProtocolParser.parseProtocol(message);
+		HashMap<pictionaryProtocolPool, String> messageInfo = pictionaryProtocolParser.parseProtocol(message);
 
 		if (messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
 
@@ -188,7 +187,7 @@ class ClientHandler implements Runnable {
 
 			if (server.isNameTaken(userDeclaredName)) {
 				sendMessageFromServerToClient("Error", "NameValidation");
-				
+
 				try {
 					String userNewName;
 					userNewName = (String) inputStream.readObject();
@@ -196,7 +195,7 @@ class ClientHandler implements Runnable {
 				} catch (ClassNotFoundException e) {
 					throw new PictionaryServerException("Name validation exception");
 				}
-				
+
 			} else {
 				userId = userDeclaredName;
 			}
@@ -230,26 +229,46 @@ class ClientHandler implements Runnable {
 			throw new PictionaryServerException("Server failed, connection lost");
 		}
 	}
-	
+
 	public void parseProtocolMessage(String plainMessage) throws PictionaryServerException, IOException {
-		HashMap<pictionaryProtocolPool, String> messageInfo=pictionaryProtocolParser.parseProtocol(plainMessage);
-		
-		if(messageInfo.get(pictionaryProtocolPool.RECEIVER).equals("server")) {
-			if(messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
-				
-				if(messageInfo.get(pictionaryProtocolPool.MESSAGE).equals("disconected")) {
-					diconnectClient();
+		HashMap<pictionaryProtocolPool, String> messageInfo = pictionaryProtocolParser.parseProtocol(plainMessage);
+		String sender = messageInfo.get(pictionaryProtocolPool.SENDER);
+		String receiver = messageInfo.get(pictionaryProtocolPool.RECEIVER);
+
+		if (sender.equals(userId)) {
+			if (receiver.equals("broadcast")) {
+				for (ClientHandler handler : server.getUsers()) {
+					if (!handler.equals(this)) {
+						handler.sendMessageToClient(plainMessage);
+					}
+				}
+			} else if (receiver.equals("server")) {
+				if (messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
+
+					if (messageInfo.get(pictionaryProtocolPool.MESSAGE).equals("disconected")) {
+						diconnectClient();
+					}
+				}
+			}else {
+				for (ClientHandler handler : server.getUsers()) {
+					if (handler.getUserId().equals(receiver)) {
+						handler.sendMessageToClient(plainMessage);
+					}
 				}
 			}
 		}
+
 	}
-	
+
 	public void diconnectClient() throws IOException {
-		if(socket!=null) socket.close();
-		if(inputStream!=null) inputStream.close();
-		if(outputStream!=null) outputStream.close();
+		if (socket != null)
+			socket.close();
+		if (inputStream != null)
+			inputStream.close();
+		if (outputStream != null)
+			outputStream.close();
 		server.removeHandler(this);
-		connected=false;
+		connected = false;
 	}
 
 	@Override
