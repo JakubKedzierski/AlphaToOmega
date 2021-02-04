@@ -176,6 +176,6 @@ public class PictionaryClient implements Runnable {
 	}
 
 	public void receivedMessage(String message) {
-		System.out.println("otrzymalem wiadomosc "+ name + " " +  message);
+		System.out.println("Client: " + name +"| Received message: " + " " +  message);
 	}
 }

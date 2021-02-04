@@ -23,6 +23,7 @@ import pictionary.pictionaryProtocolPool;
 
 public class PictionaryServer implements Runnable {
 	public static int SERVER_PORT = 25000;
+	private @Getter boolean serverRunning=false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
 	private int userCount = 0;
 
@@ -37,6 +38,7 @@ public class PictionaryServer implements Runnable {
 
 	public void run() {
 		try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
+			serverRunning=true;
 			int port = serverSocket.getLocalPort();
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
@@ -52,16 +54,22 @@ public class PictionaryServer implements Runnable {
 				}
 
 			}
-
-			while (true) {
-			} // to keep thread alive
+		
+			while (serverRunning) {	// to keep thread alive
+			} 
 
 		} catch (IOException ioException) {
 			System.out.println("Issues with listening thread");
 			return;
 		}
-
+		
 	}
+	
+	public void disconnectServer() {
+		serverRunning=false;
+		// inform clients about disconnection if there are clients + end up game
+	}
+	
 
 	public ClientHandler getClientHandlerById(final String id) {
 		for (ClientHandler handler : users) {
