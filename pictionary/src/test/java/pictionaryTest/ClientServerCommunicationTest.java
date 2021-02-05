@@ -40,10 +40,18 @@ public class ClientServerCommunicationTest {
 			client2.disconnect();
 			client3.disconnect();
 			client4.disconnect();
-			Thread.sleep(200);
-
+			Thread.sleep(300);
+			
 			assertEquals(0, server.getUsers().size());
 			assertEquals(0, server.getUsersIdList().size());
+			
+			/*PictionaryClient client5 =new PictionaryClient("test5");
+			Thread.sleep(200);
+			client5.disconnect();
+			Thread.sleep(300);
+			
+			assertEquals(0, server.getUsers().size());
+			assertEquals(0, server.getUsersIdList().size());*/
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -56,6 +64,7 @@ public class ClientServerCommunicationTest {
 		}
 
 	}
+	
 
 	@After
 	public void cleanUp() {

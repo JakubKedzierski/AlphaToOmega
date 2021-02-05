@@ -33,7 +33,9 @@ public class PictionaryClient implements Runnable {
 	public static void main(String[] args) {
 		new PictionaryClient("test");
 	}
+	
 
+	
 	public PictionaryClient(String name) {
 		if (name != null)
 			this.name = name;

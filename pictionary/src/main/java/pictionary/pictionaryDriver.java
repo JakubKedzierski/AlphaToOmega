@@ -23,13 +23,15 @@ public class pictionaryDriver {
 			client1.sendMessage("chat", "test message", "broadcast");
 			client1.sendMessage("chat", "trying direct message", "test3");
 			
+			client1.sendMessage("chat", "trying direct message", "test6"); // should throw error but is not throwing
 			
-			Thread.sleep(600);
+			
+			Thread.sleep(1000);
 			client1.disconnect();
 			client2.disconnect();
 			client3.disconnect();
 			client4.disconnect();
-			Thread.sleep(200);
+			Thread.sleep(300);
 			System.out.println(server.getUsers());
 			server.disconnectServer();
 		} catch (InterruptedException e) {
