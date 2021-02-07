@@ -2,6 +2,7 @@ package pictionaryTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -54,12 +55,13 @@ public class ClientServerCommunicationTest {
 			assertEquals(0, server.getUsersIdList().size());*/
 
 		} catch (InterruptedException e) {
+			fail();
 			e.printStackTrace();
 		} catch (PictionaryClientException e) {
-			// TODO Auto-generated catch block
+			fail();
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			fail();
 			e.printStackTrace();
 		}
 

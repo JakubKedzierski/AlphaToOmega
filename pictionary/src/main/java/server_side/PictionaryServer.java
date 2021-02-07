@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.management.RuntimeErrorException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,14 +20,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import pictionary.GameCommunication;
+import pictionary.Pictionary;
 import pictionary.pictionaryProtocolParser;
 import pictionary.pictionaryProtocolPool;
 
-public class PictionaryServer implements Runnable {
+public class PictionaryServer implements Runnable, GameCommunication {
 	public static int SERVER_PORT = 25000;
 	private @Getter boolean serverRunning = false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
 	private int userCount = 0;
+	private Pictionary game = null;
 
 	public PictionaryServer() {
 		new Thread(this).start();
@@ -45,7 +50,7 @@ public class PictionaryServer implements Runnable {
 			System.out.println("Host address: " + address);
 
 			while (serverRunning) { // to keep thread alive
-				
+
 				while (userCount < 4) {
 					Socket clientSocket = serverSocket.accept();
 					if (clientSocket != null) {
@@ -54,8 +59,14 @@ public class PictionaryServer implements Runnable {
 						users.add(userHandler);
 						userCount++;
 					}
-
 				}
+
+				game = new Pictionary(this);
+				for (ClientHandler handler : users) {
+					String name = handler.getUserId();
+					game.addUser(name);
+				}
+				game.startGame();
 
 			}
 
@@ -110,6 +121,27 @@ public class PictionaryServer implements Runnable {
 			nameList.add(name);
 		}
 		return nameList;
+	}
+
+	@Override
+	public void sendHostInfo(String userId, String word) throws PictionaryServerException {
+		ClientHandler handler = getClientHandlerById(userId);
+		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"host\"}");
+		handler.sendMessageFromServerToClient("gameInfo", "{\"word\":\"" + word + "\"}");
+	}
+
+	@Override
+	public void sendListenerInfo(String userId) throws PictionaryServerException {
+		ClientHandler handler = getClientHandlerById(userId);
+		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"listener\"}");
+	}
+
+	@Override
+	public void sendEndGameInfo() throws PictionaryServerException {
+		for (ClientHandler handler : users) {
+			handler.sendMessageFromServerToClient("gameInfo", "game ended");
+		}
+
 	}
 
 }
@@ -258,7 +290,7 @@ class ClientHandler implements Runnable {
 						diconnectClient();
 					}
 				}
-			} else {	
+			} else {
 				for (ClientHandler handler : server.getUsers()) {
 					if (handler.getUserId().equals(receiver)) {
 						handler.sendMessageToClient(plainMessage);

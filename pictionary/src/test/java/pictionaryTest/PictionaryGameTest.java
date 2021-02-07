@@ -50,7 +50,7 @@ public class PictionaryGameTest {
 		}catch(IllegalArgumentException e) {}
 		
 		try {
-			game.checkWord("testWord", "test1");
+			game.checkWord("testWord", "test2");
 			fail(); // should throw error because we ask second time for word that we already guessed
 		}catch(IllegalArgumentException e) {}
 		
