@@ -44,12 +44,11 @@ public class PictionaryGameTest {
 		assertEquals(0,game.getUserByName("test2").getPoints());
 		assertEquals(true,game.isGameRunning());
 		
-		/*
 		try {
 			game.checkWord("testWord", "test1");
-			fail(); // should throw error becasue we ask second time for word that we already guessed
+			fail(); // should throw error because we ask second time for word that we already guessed
 		}catch(IllegalArgumentException e) {}
-		*/
+		
 		
 		try {
 			Thread.sleep(game.getRound().getRoundTime() + 50);

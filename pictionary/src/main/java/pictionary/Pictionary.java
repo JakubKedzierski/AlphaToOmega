@@ -55,23 +55,25 @@ public class Pictionary {
 	}
 
 	private void gameLoop() {
-		chooseNewHost();
-		round = new PictionaryRound(wordDatabase[roundCount], this);
+		PictionaryPlayer host=chooseNewHost();
+		round = new PictionaryRound(wordDatabase[roundCount], this,host);
 		roundCount++;
 	}
 
-	private void chooseNewHost() {
-		int host = roundCount;
-		server.sendHostInfo(users.get(host).getName(),wordDatabase[host]);
+	private PictionaryPlayer chooseNewHost() {
+		PictionaryPlayer host = users.get(roundCount);
+		server.sendHostInfo(host.getName(),wordDatabase[roundCount]);
+		
 		for (int i = 0; i < NUMBER_OF_PLAYERS; i++) {
-			if (i != host)
+			if (i != roundCount)
 				server.sendListenerInfo(users.get(i).getName());
 		}
+		return host;
 	}
 
 	public boolean checkWord(String word, String name) {
 		PictionaryPlayer player=getUserByName(name);
-		if (round.guessedWord(word)) {
+		if (round.guessedWord(word,player)) {
 			player.addPoints(1);
 			return true;
 		}

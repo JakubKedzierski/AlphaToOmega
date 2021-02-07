@@ -2,6 +2,7 @@ package pictionary;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
@@ -14,8 +15,8 @@ public class PictionaryRound {
 	private @Getter long roundTime = 20 * 1000;
 	private Pictionary game;
 	private @Getter int goodGuessCount = 0;
-	// add pool for players who already guessed
-
+	private @Getter ArrayList<PictionaryPlayer> usersWhoAlreadyGuessed = new ArrayList<PictionaryPlayer>();
+	private @Getter PictionaryPlayer host = null;
 
 	public PictionaryRound(long roundTime, String wordToGuess, Pictionary game) {
 		this.roundTime = roundTime;
@@ -34,8 +35,9 @@ public class PictionaryRound {
 		startRound();
 	}
 
-	public PictionaryRound(String wordToGuess, Pictionary game) {
+	public PictionaryRound(String wordToGuess, Pictionary game, PictionaryPlayer host) {
 		this(20 * 1000, wordToGuess, game);
+		this.host=host;
 	}
 	
 	public void startRound() {
@@ -46,6 +48,15 @@ public class PictionaryRound {
 		running = false;
 		game.roundEnded();
 		System.out.println("Round ends");
+	}
+	public boolean guessedWord(String word,PictionaryPlayer player) {
+		if(usersWhoAlreadyGuessed.contains(player)) throw new IllegalArgumentException("This user already guessed the word");
+		
+		if(guessedWord(word)) {
+			usersWhoAlreadyGuessed.add(player);
+			return true;
+		}
+		return false;
 	}
 
 	public boolean guessedWord(String word) {
