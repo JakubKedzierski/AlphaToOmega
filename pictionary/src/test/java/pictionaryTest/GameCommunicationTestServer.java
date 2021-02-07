@@ -5,21 +5,21 @@ import pictionary.GameCommunication;
 public class GameCommunicationTestServer implements GameCommunication{
 
 	@Override
-	public void sendHostInfo(String userId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void sendListenerInfo(String userId) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Sent listener info to " + userId);
+	}
+
+
+	@Override
+	public void sendEndGameInfo() {
+		System.out.println("Sent end game info to everyone");
 	}
 
 	@Override
-	public void sendGuessingWord(String word) {
-		// TODO Auto-generated method stub
+	public void sendHostInfo(String userId, String word) {
+		System.out.println("Sent host info to " +userId + " and gueess word: " + word);
 		
 	}
 
+	
 }

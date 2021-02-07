@@ -2,70 +2,98 @@ package pictionary;
 
 import java.util.ArrayList;
 
+import lombok.Getter;
 
-public class Pictionary{
-	private String[] wordDataBase={"rabbit", "house" , "river", "shrek"};
-	public static int NUMBER_OF_PLAYERS=4;
-	ArrayList<PictionaryPlayer> users;
-	GameCommunication server;
-	int roundCount;
-	PictionaryRound round=null;
+public class Pictionary {
+	private int NUMBER_OF_PLAYERS = 4;
+	private int NUMBER_OF_ROUNDS = 4;
 	
+	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
+	private ArrayList<PictionaryPlayer> users;
+	private GameCommunication server;
+	private @Getter int roundCount;
+	private @Getter PictionaryRound  round = null;
+	private @Getter boolean gameRunning=false;
 	
-	
-	public Pictionary(GameCommunication server){
-		this.server=server;
-		this.users=new ArrayList<PictionaryPlayer>();
-		roundCount=0;
+	public Pictionary(GameCommunication server, String[] wordDatabase,int numberOfRounds, int numberOfPlayers) {
+		this(server,wordDatabase);
+		this.NUMBER_OF_PLAYERS=numberOfPlayers;
+		this.NUMBER_OF_ROUNDS=numberOfRounds;
 	}
 	
+	public Pictionary(GameCommunication server, String[] wordDatabase) {
+		this(server);
+		this.wordDatabase=wordDatabase;
+	}
+	
+	public Pictionary(GameCommunication server) {
+		this.server = server;
+		this.users = new ArrayList<PictionaryPlayer>();
+		roundCount = 0;
+	}
+
 	public void addUser(String name) {
-		PictionaryPlayer player= new PictionaryPlayer(name);
+		PictionaryPlayer player = new PictionaryPlayer(name);
 		users.add(player);
 	}
-	
+
 	public void deleteUser(String name) {
-		for(PictionaryPlayer user:users) {
-			if(user.getName().equals(name)) {
+		for (PictionaryPlayer user : users) {
+			if (user.getName().equals(name)) {
 				users.remove(user);
 			}
 		}
 	}
-	
+
 	public void startGame() {
-		if(users.size()==NUMBER_OF_PLAYERS && server!=null) {
-			newRound();
-		}else {
+		if (users.size() == NUMBER_OF_PLAYERS && server != null) {
+			gameRunning=true;
+			gameLoop();
+		} else {
 			throw new IllegalArgumentException("More users needed to start a game");
 		}
 	}
-	
-	private void newRound() {
+
+	private void gameLoop() {
 		chooseNewHost();
-		round=new PictionaryRound(wordDataBase[roundCount],this);
+		round = new PictionaryRound(wordDatabase[roundCount], this);
 		roundCount++;
 	}
 
 	private void chooseNewHost() {
-		int host=roundCount;
-		server.sendHostInfo(users.get(host).getName());
-		for(int i=0;i<NUMBER_OF_PLAYERS;i++) {
-			if(i!=host) server.sendListenerInfo(users.get(i).getName());
-		}
-		server.sendGuessingWord(wordDataBase[host]);
-	}
-	
-	public void checkWord(String word) {
-		
-		if(round.guessedWord(word)) {
-			
-		}else {
-			
+		int host = roundCount;
+		server.sendHostInfo(users.get(host).getName(),wordDatabase[host]);
+		for (int i = 0; i < NUMBER_OF_PLAYERS; i++) {
+			if (i != host)
+				server.sendListenerInfo(users.get(i).getName());
 		}
 	}
+
+	public boolean checkWord(String word, String name) {
+		PictionaryPlayer player=getUserByName(name);
+		if (round.guessedWord(word)) {
+			player.addPoints(1);
+			return true;
+		}
+		return false;
+	}
 	
+	public PictionaryPlayer getUserByName(String name) {
+		for(PictionaryPlayer player:users) {
+			if(player.getName().equals(name)) {
+				return player;
+			}
+		}
+		return null;
+	}
+
 	public void roundEnded() {
-		
+		if(roundCount<NUMBER_OF_ROUNDS) {
+			gameLoop();
+		}else {
+			gameRunning=false;
+			server.sendEndGameInfo();
+		}
 	}
-	
+
 }

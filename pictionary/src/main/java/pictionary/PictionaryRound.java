@@ -1,47 +1,64 @@
 package pictionary;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Timer;
 
 import lombok.Getter;
 
 public class PictionaryRound {
 	private String wordToGuess;
 	private Timer timer;
-	private @Getter boolean running=false;
-	public static long ROUND_TIME=20*1000;
+	private @Getter boolean running = false;
+	private @Getter long roundTime = 20 * 1000;
 	private Pictionary game;
+	private @Getter int goodGuessCount = 0;
+	// add pool for players who already guessed
 
-	public PictionaryRound(String wordToGuess,Pictionary game) {
+
+	public PictionaryRound(long roundTime, String wordToGuess, Pictionary game) {
+		this.roundTime = roundTime;
 		this.wordToGuess = wordToGuess;
-		this.game=game;
-		timer = new Timer();
-		running=true;
-		timer.schedule(new TimerTask() {
+		this.game = game;
+		running = true;
+		timer = new Timer((int) roundTime, new ActionListener() {
 			@Override
-			public void run() {
+			public void actionPerformed(ActionEvent arg0) {
 				endRound();
 			}
-		}, ROUND_TIME);
+		});
+		
+		timer.setInitialDelay(100);
+		timer.setRepeats(false); 
+		startRound();
+	}
+
+	public PictionaryRound(String wordToGuess, Pictionary game) {
+		this(20 * 1000, wordToGuess, game);
+	}
+	
+	public void startRound() {
+		if(!timer.isRunning()) timer.start();
 	}
 
 	public void endRound() {
-		timer.cancel();
-		timer.purge();
-		running=false;
+		running = false;
 		game.roundEnded();
 		System.out.println("Round ends");
 	}
-	
+
 	public boolean guessedWord(String word) {
-		if(running) {
-			if(word.equals(wordToGuess)) return true;
-		}else {
+		if (running) {
+			if (word.equals(wordToGuess)) {
+				goodGuessCount++; // add sending info which guess it is in return tuple (pair<integer, integer>)
+				return true;
+			}
+		} else {
 			throw new IllegalArgumentException("Round is stopped");
 		}
-		
+
 		return false;
 	}
-
 
 }
