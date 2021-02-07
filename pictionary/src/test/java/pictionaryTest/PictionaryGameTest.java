@@ -39,10 +39,15 @@ public class PictionaryGameTest {
 		game = new Pictionary(server,database,1,2);
 		game.addUser("test1");game.addUser("test2");
 		game.startGame();
-		assertEquals(true,game.checkWord("testWord", "test1"));
-		assertEquals(1,game.getUserByName("test1").getPoints());
-		assertEquals(0,game.getUserByName("test2").getPoints());
+		assertEquals(true,game.checkWord("testWord", "test2"));
+		assertEquals(2,game.getUserByName("test2").getPoints());
+		assertEquals(0,game.getUserByName("test1").getPoints());
 		assertEquals(true,game.isGameRunning());
+		
+		try {
+			game.checkWord("testWord", "test1");
+			fail();
+		}catch(IllegalArgumentException e) {}
 		
 		try {
 			game.checkWord("testWord", "test1");
@@ -57,6 +62,7 @@ public class PictionaryGameTest {
 		}
 		assertEquals(false,game.getRound().isRunning());
 		assertEquals(1,game.getUserByName("test1").getPoints()); 
+		assertEquals(2,game.getUserByName("test2").getPoints()); 
 		assertEquals(1,game.getRoundCount());
 		assertEquals(false,game.isGameRunning());
 	}

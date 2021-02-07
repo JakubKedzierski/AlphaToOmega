@@ -73,8 +73,10 @@ public class Pictionary {
 
 	public boolean checkWord(String word, String name) {
 		PictionaryPlayer player=getUserByName(name);
+		if(round.getHost()==player) throw new IllegalArgumentException("This player is a host.");
+		
 		if (round.guessedWord(word,player)) {
-			player.addPoints(1);
+			player.addPoints(2);
 			return true;
 		}
 		return false;
@@ -90,6 +92,9 @@ public class Pictionary {
 	}
 
 	public void roundEnded() {
+		PictionaryPlayer host=round.getHost();
+		host.addPoints(round.getGoodGuessCount());
+		
 		if(roundCount<NUMBER_OF_ROUNDS) {
 			gameLoop();
 		}else {

@@ -12,7 +12,7 @@ public class PictionaryRound {
 	private String wordToGuess;
 	private Timer timer;
 	private @Getter boolean running = false;
-	private @Getter long roundTime = 20 * 1000;
+	private @Getter long roundTime = 1 * 1000;
 	private Pictionary game;
 	private @Getter int goodGuessCount = 0;
 	private @Getter ArrayList<PictionaryPlayer> usersWhoAlreadyGuessed = new ArrayList<PictionaryPlayer>();
@@ -36,7 +36,7 @@ public class PictionaryRound {
 	}
 
 	public PictionaryRound(String wordToGuess, Pictionary game, PictionaryPlayer host) {
-		this(20 * 1000, wordToGuess, game);
+		this(1 * 1000, wordToGuess, game);
 		this.host=host;
 	}
 	
@@ -49,6 +49,7 @@ public class PictionaryRound {
 		game.roundEnded();
 		System.out.println("Round ends");
 	}
+	
 	public boolean guessedWord(String word,PictionaryPlayer player) {
 		if(usersWhoAlreadyGuessed.contains(player)) throw new IllegalArgumentException("This user already guessed the word");
 		
