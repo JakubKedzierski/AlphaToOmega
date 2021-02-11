@@ -1,8 +1,9 @@
 package pictionaryTest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -12,7 +13,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import pictionary.pictionaryProtocolParser;
+import protocol_parser.PictionaryProtocolParser;
+import protocol_parser.PictionaryProtocolPool;
+import server_side.PictionaryException;
 
 public class pictionaryProcolParserTest {
 
@@ -27,9 +30,9 @@ public class pictionaryProcolParserTest {
 		String checkedMessage;
 		try {
 			checkedMessage = mapper.writeValueAsString(node);
-			pictionaryProtocolParser.parseProtocol(checkedMessage);
+			PictionaryProtocolParser.parseProtocol(checkedMessage);
 		} catch (JacksonException e) {
-			e.printStackTrace();
+			fail();
 		}
 
 	}
@@ -47,11 +50,29 @@ public class pictionaryProcolParserTest {
 		try {
 			checkedMessage = mapper.writeValueAsString(node);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			fail();
 		}
 		checkedMessage = checkedMessage + "testMessage312312";
-		pictionaryProtocolParser.parseProtocol(checkedMessage);
+		PictionaryProtocolParser.parseProtocol(checkedMessage);
 
+	}
+	
+	@Test
+	public void shouldCreateProperProtocolAndParseItWell() {
+		try {
+			String message=PictionaryProtocolParser.createProtocolMessage("testSender", "testReceiver", "Error", "testMessage");
+			System.out.println(message);
+			HashMap<PictionaryProtocolPool, String> map= new HashMap<PictionaryProtocolPool, String>();
+			map=PictionaryProtocolParser.parseProtocol(message);
+			assertEquals("testMessage", map.get(PictionaryProtocolPool.MESSAGE));
+			assertEquals("testSender", map.get(PictionaryProtocolPool.SENDER));
+			assertEquals("testReceiver", map.get(PictionaryProtocolPool.RECEIVER));
+			assertEquals("Error", map.get(PictionaryProtocolPool.MESSAGETYPE));
+		} catch (JsonProcessingException | PictionaryException e) {
+			fail();
+		} catch (JacksonException e) {
+			fail();
+		}
 	}
 
 }

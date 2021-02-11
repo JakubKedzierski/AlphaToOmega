@@ -9,8 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import pictionary.GameCommunication;
-import pictionary.Pictionary;
+import server_side.GameCommunication;
+import server_side.pictionary.Pictionary;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PictionaryGameTest {

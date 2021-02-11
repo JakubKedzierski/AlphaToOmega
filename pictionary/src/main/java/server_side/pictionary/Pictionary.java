@@ -1,12 +1,15 @@
-package pictionary;
+package server_side.pictionary;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import lombok.Getter;
-import server_side.PictionaryServerException;
+import server_side.GameCommunication;
+import server_side.PictionaryException;
 
-public class Pictionary {
-	private int NUMBER_OF_PLAYERS = 4;
+
+public class Pictionary implements PictionaryInterface{
+	private int NUMBER_OF_PLAYERS = 2;
 	private int NUMBER_OF_ROUNDS = 4;
 
 	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
@@ -56,55 +59,59 @@ public class Pictionary {
 	}
 
 	private void gameLoop() {
-		PictionaryPlayer host = chooseNewHost();
-		round = new PictionaryRound(wordDatabase[roundCount], this, host);
+		chooseNewHost();
+		round = new PictionaryRound(wordDatabase[roundCount],this);
 		roundCount++;
 	}
 
-	private PictionaryPlayer chooseNewHost() {
-		PictionaryPlayer host = users.get(roundCount);
-
-		try {
-			server.sendHostInfo(host.getName(), wordDatabase[roundCount]);
-		} catch (PictionaryServerException cirticalException) {
-			cleanUpAndUnexpectedEndGame();
-		}
-
-		for (int i = 0; i < NUMBER_OF_PLAYERS; i++) {
-			if (i != roundCount)
+	private void chooseNewHost() {
+		for(int i=0;i<users.size();i++) {
+			PictionaryPlayer player = users.get(i);
+			
+			if(i==roundCount) {
+				player.setTypeOfPlayer("host");
+				try {
+					server.sendHostInfo(player.getName(), wordDatabase[roundCount]);
+				} catch (PictionaryException | IOException cirticalException) {
+					cleanUpAndUnexpectedEndGame();
+				} 
+			}
+			
+			else {
+				player.setTypeOfPlayer("listener");
 				try {
 					server.sendListenerInfo(users.get(i).getName());
-				} catch (PictionaryServerException cirticalException) {
+				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
-				}
+				} 
+			}
 		}
-		return host;
+
 	}
 
 	public boolean checkWord(String word, String name) {
 		PictionaryPlayer player = getUserByName(name);
-		if (round.getHost() == player)
-			throw new IllegalArgumentException("This player is a host.");
-
-		if (round.guessedWord(word, player)) {
+		
+		if(player==null) throw new IllegalArgumentException("Player not found");
+		if(player.getTypeOfPlayer().equals("host")) throw new IllegalArgumentException("Player is host");
+		if(player.isGoodGuessAlreadyDone()) throw new IllegalArgumentException("Player already made a guess");
+			
+		if (round.guessedWord(word)) {
 			player.addPoints(2);
+			player.setGoodGuessAlreadyDone(true);
 			return true;
 		}
 		return false;
 	}
 
-	public PictionaryPlayer getUserByName(String name) {
-		for (PictionaryPlayer player : users) {
-			if (player.getName().equals(name)) {
-				return player;
-			}
-		}
-		return null;
-	}
 
 	public void roundEnded() {
-		PictionaryPlayer host = round.getHost();
+		PictionaryPlayer host = getHost();
 		host.addPoints(round.getGoodGuessCount());
+		
+		for(PictionaryPlayer player:users) {
+			player.setGoodGuessAlreadyDone(false);
+		}
 
 		if (roundCount < NUMBER_OF_ROUNDS) {
 			gameLoop();
@@ -113,7 +120,7 @@ public class Pictionary {
 			
 			try {
 				server.sendEndGameInfo();
-			} catch (PictionaryServerException cirticalException) {
+			} catch (PictionaryException | IOException cirticalException) {
 				cleanUpAndUnexpectedEndGame();
 			}
 		
@@ -123,6 +130,24 @@ public class Pictionary {
 	public void cleanUpAndUnexpectedEndGame() {
 		gameRunning = false; // clean up and end game
 		
+	}
+	
+	public PictionaryPlayer getUserByName(String name) {
+		for (PictionaryPlayer player : users) {
+			if (player.getName().equals(name)) {
+				return player;
+			}
+		}
+		return null;
+	}
+	
+	public PictionaryPlayer getHost() {
+		for (PictionaryPlayer player : users) {
+			if (player.getTypeOfPlayer().equals("host")) {
+				return player;
+			}
+		}
+		return null;
 	}
 
 }

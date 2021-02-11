@@ -10,8 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import client_side.PictionaryClient;
-import client_side.PictionaryClientException;
+import client_side.gui.model.PictionaryClient;
+import server_side.PictionaryException;
 import server_side.PictionaryServer;
 
 public class ClientServerCommunicationTest {
@@ -27,16 +27,16 @@ public class ClientServerCommunicationTest {
 	public void usersListShouldBeEmpty() {
 		try {
 			Thread.sleep(600);
-			PictionaryClient client1 = new PictionaryClient("test1");
+			PictionaryClient client1 = new PictionaryClient("test1",true);
 			Thread.sleep(300);
-			PictionaryClient client2 = new PictionaryClient("test2");
+			PictionaryClient client2 = new PictionaryClient("test2",true);
 			Thread.sleep(300);
-			PictionaryClient client3 = new PictionaryClient("test3");
+			PictionaryClient client3 = new PictionaryClient("test3",true);
 			Thread.sleep(300);
-			PictionaryClient client4 = new PictionaryClient("test4");
+			PictionaryClient client4 = new PictionaryClient("test4",true);
 			Thread.sleep(300);
 			assertEquals(4, server.getUsers().size());
-			Thread.sleep(100);
+			Thread.sleep(1000);
 			client1.disconnect();
 			client2.disconnect();
 			client3.disconnect();
@@ -57,13 +57,7 @@ public class ClientServerCommunicationTest {
 		} catch (InterruptedException e) {
 			fail();
 			e.printStackTrace();
-		} catch (PictionaryClientException e) {
-			fail();
-			e.printStackTrace();
-		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
-		}
+		} 
 
 	}
 	

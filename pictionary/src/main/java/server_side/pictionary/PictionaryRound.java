@@ -1,27 +1,27 @@
-package pictionary;
+package server_side.pictionary;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+
 
 import javax.swing.Timer;
 
 import lombok.Getter;
 
-public class PictionaryRound {
+public class PictionaryRound{
 	private String wordToGuess;
 	private Timer timer;
 	private @Getter boolean running = false;
 	private @Getter long roundTime = 1 * 1000;
-	private Pictionary game;
 	private @Getter int goodGuessCount = 0;
-	private @Getter ArrayList<PictionaryPlayer> usersWhoAlreadyGuessed = new ArrayList<PictionaryPlayer>();
-	private @Getter PictionaryPlayer host = null;
+	private PictionaryInterface pictionary;  // to make callback after round ends
 
-	public PictionaryRound(long roundTime, String wordToGuess, Pictionary game) {
+
+	public PictionaryRound(long roundTime, String wordToGuess, PictionaryInterface pictionary) {
 		this.roundTime = roundTime;
 		this.wordToGuess = wordToGuess;
-		this.game = game;
+		this.pictionary=pictionary;
+		
 		running = true;
 		timer = new Timer((int) roundTime, new ActionListener() {
 			@Override
@@ -35,9 +35,8 @@ public class PictionaryRound {
 		startRound();
 	}
 
-	public PictionaryRound(String wordToGuess, Pictionary game, PictionaryPlayer host) {
-		this(1 * 1000, wordToGuess, game);
-		this.host=host;
+	public PictionaryRound(String wordToGuess,PictionaryInterface pictionary) {
+		this(1 * 1000, wordToGuess,pictionary);
 	}
 	
 	public void startRound() {
@@ -46,24 +45,14 @@ public class PictionaryRound {
 
 	public void endRound() {
 		running = false;
-		game.roundEnded();
-		System.out.println("Round ends");
+		pictionary.roundEnded();
 	}
 	
-	public boolean guessedWord(String word,PictionaryPlayer player) {
-		if(usersWhoAlreadyGuessed.contains(player)) throw new IllegalArgumentException("This user already guessed the word");
-		
-		if(guessedWord(word)) {
-			usersWhoAlreadyGuessed.add(player);
-			return true;
-		}
-		return false;
-	}
 
 	public boolean guessedWord(String word) {
 		if (running) {
 			if (word.equals(wordToGuess)) {
-				goodGuessCount++; // add sending info which guess it is in return tuple (pair<integer, integer>)
+				goodGuessCount++; 
 				return true;
 			}
 		} else {
@@ -72,5 +61,6 @@ public class PictionaryRound {
 
 		return false;
 	}
+
 
 }

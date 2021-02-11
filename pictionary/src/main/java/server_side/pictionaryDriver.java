@@ -1,10 +1,7 @@
-package pictionary;
+package server_side;
 
-import java.io.IOException;
 
-import client_side.PictionaryClient;
-import client_side.PictionaryClientException;
-import server_side.PictionaryServer;
+import client_side.gui.model.PictionaryClient;
 
 public class pictionaryDriver {
 
@@ -12,13 +9,13 @@ public class pictionaryDriver {
 		PictionaryServer server=new PictionaryServer();
 		try {
 			Thread.sleep(600);
-			PictionaryClient client1=  new PictionaryClient("test1");
+			PictionaryClient client1=  new PictionaryClient("test1",true);
 			Thread.sleep(300);
-			PictionaryClient client2=new PictionaryClient("test2");
+			PictionaryClient client2=new PictionaryClient("test2",true);
 			Thread.sleep(300);
-			PictionaryClient client3=new PictionaryClient("test3");
+			PictionaryClient client3=new PictionaryClient("test3",true);
 			Thread.sleep(300);
-			PictionaryClient client4 = new PictionaryClient("test4");
+			PictionaryClient client4 = new PictionaryClient("test4",true);
 			Thread.sleep(300);
 			client1.sendMessage("chat", "test message", "broadcast");
 			client1.sendMessage("chat", "trying direct message", "test3");
@@ -31,18 +28,10 @@ public class pictionaryDriver {
 			client2.disconnect();
 			client3.disconnect();
 			client4.disconnect();
-			Thread.sleep(300);
 			System.out.println(server.getUsers());
 			server.disconnectServer();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (PictionaryClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (Exception e) {
+			e.printStackTrace();} 
 		
 		
 	}

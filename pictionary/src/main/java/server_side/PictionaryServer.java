@@ -9,9 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import javax.management.RuntimeErrorException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,16 +17,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import pictionary.GameCommunication;
-import pictionary.Pictionary;
-import pictionary.pictionaryProtocolParser;
-import pictionary.pictionaryProtocolPool;
+import protocol_parser.PictionaryProtocolParser;
+import protocol_parser.PictionaryProtocolPool;
+import server_side.pictionary.Pictionary;
 
-public class PictionaryServer implements Runnable, GameCommunication {
+public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
 	public static int SERVER_PORT = 25000;
+	public static int PLAYERS_TO_START_GAME = 2;
 	private @Getter boolean serverRunning = false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
-	private int userCount = 0;
 	private Pictionary game = null;
 
 	public PictionaryServer() {
@@ -48,31 +44,41 @@ public class PictionaryServer implements Runnable, GameCommunication {
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
 			System.out.println("Host address: " + address);
+			
+			game = new Pictionary(this);
 
-			while (serverRunning) { // to keep thread alive
-
-				while (userCount < 4) {
-					Socket clientSocket = serverSocket.accept();
-					if (clientSocket != null) {
-						System.out.println("Connection accepted");
-						ClientHandler userHandler = new ClientHandler(this, clientSocket);
-						users.add(userHandler);
-						userCount++;
-					}
+			while (users.size() < PLAYERS_TO_START_GAME) {
+				Socket clientSocket = serverSocket.accept();
+				if (clientSocket != null) {
+					System.out.println("Connection accepted");
+					ClientHandler userHandler = new ClientHandler(this, clientSocket);
+					users.add(userHandler);
 				}
+			}
 
-				game = new Pictionary(this);
-				for (ClientHandler handler : users) {
-					String name = handler.getUserId();
-					game.addUser(name);
-				}
-				game.startGame();
-
+			startGame();
+			while (serverRunning) { // to keep thread alive and server socket open
 			}
 
 		} catch (IOException ioException) {
 			System.out.println("Issues with listening thread");
 			return;
+		}
+
+	}
+
+	public void addUserToGame(String name) {
+		game.addUser(name);
+	}
+
+	public void startGame() {
+		try {
+			Thread.sleep(5000);
+			String jsonMessage = PictionaryProtocolParser.createProtocolMessage("server", "broadcast", "gameInfo","StartGame");
+			sendBroadcastMessage("server", jsonMessage);
+		} catch (IOException | PictionaryException | InterruptedException  e) {
+			System.out.println("rzucam");
+			e.printStackTrace();
 		}
 
 	}
@@ -111,7 +117,6 @@ public class PictionaryServer implements Runnable, GameCommunication {
 
 	public void removeHandler(ClientHandler clientHandler) {
 		users.remove(clientHandler);
-		userCount--;
 	}
 
 	public ArrayList<String> getUsersIdList() {
@@ -124,24 +129,40 @@ public class PictionaryServer implements Runnable, GameCommunication {
 	}
 
 	@Override
-	public void sendHostInfo(String userId, String word) throws PictionaryServerException {
+	public void sendHostInfo(String userId, String word) throws IOException, PictionaryException {
 		ClientHandler handler = getClientHandlerById(userId);
 		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"host\"}");
 		handler.sendMessageFromServerToClient("gameInfo", "{\"word\":\"" + word + "\"}");
 	}
 
 	@Override
-	public void sendListenerInfo(String userId) throws PictionaryServerException {
+	public void sendListenerInfo(String userId) throws PictionaryException, IOException {
 		ClientHandler handler = getClientHandlerById(userId);
 		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"listener\"}");
 	}
 
 	@Override
-	public void sendEndGameInfo() throws PictionaryServerException {
+	public void sendEndGameInfo() throws PictionaryException, IOException {
 		for (ClientHandler handler : users) {
 			handler.sendMessageFromServerToClient("gameInfo", "game ended");
 		}
 
+	}
+
+	public void sendMessageToClient(String username, String message) throws IOException {
+		for (ClientHandler handler : users) {
+			if (handler.getUserId().equals(username)) {
+				handler.sendMessageDirectlyToHandledClient(message);
+			}
+		}
+	}
+
+	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {
+		for (ClientHandler handler : users) {
+			if (!handler.getUserId().equals(senderUsername)) {
+				handler.sendMessageDirectlyToHandledClient(message);
+			}
+		}
 	}
 
 }
@@ -150,8 +171,7 @@ public class PictionaryServer implements Runnable, GameCommunication {
 class ClientHandler implements Runnable {
 
 	private @Getter @Setter String userId = null;
-
-	private PictionaryServer server = null;
+	private ServerHandlerInterface server = null;
 	private @Getter Socket socket = null;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
@@ -175,12 +195,7 @@ class ClientHandler implements Runnable {
 			String message = (String) inputStream.readObject();
 
 			if (message != null) {
-				try {
-					newConnectionStartup(message);
-				} catch (IOException fatalException) {
-					server.removeHandler(this);
-					return;
-				}
+				newConnectionStartup(message);
 			}
 
 			while (true) {
@@ -193,18 +208,21 @@ class ClientHandler implements Runnable {
 				}
 			}
 
-		} catch (Exception exception) {
+		} catch (IOException | ClassNotFoundException exception) {
 			System.out.println("Client connecetion failed");
 			server.removeHandler(this);
 			return;
+		} catch (PictionaryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
 
-	public void nameValidation(String userDeclaredName) throws PictionaryServerException, IOException {
+	public void nameValidation(String userDeclaredName) throws PictionaryException, IOException {
 		while (server.isNameTaken(userDeclaredName)) {
 
-			sendMessageFromServerToClient("Error", "NameValidation");
+			sendMessageFromServerToClient("NameValidation", "InvalidName");
 
 			try {
 				userDeclaredName = (String) inputStream.readObject();
@@ -217,85 +235,73 @@ class ClientHandler implements Runnable {
 		userId = userDeclaredName;
 	}
 
-	private void newConnectionStartup(String message) throws PictionaryServerException, IOException {
+	private void newConnectionStartup(String message) throws PictionaryException, IOException {
 
-		HashMap<pictionaryProtocolPool, String> messageInfo = pictionaryProtocolParser.parseProtocol(message);
+		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(message);
 
-		if (messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
+		if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
 
-			String userDeclaredName = messageInfo.get(pictionaryProtocolPool.MESSAGE);
+			String userDeclaredName = messageInfo.get(PictionaryProtocolPool.MESSAGE);
 
 			if (server.isNameTaken(userDeclaredName)) {
-				sendMessageFromServerToClient("Error", "NameValidation");
+				sendMessageFromServerToClient("NameValidation", "InvalidName");
 
 				try {
 					String userNewName;
 					userNewName = (String) inputStream.readObject();
 					newConnectionStartup(userNewName);
 				} catch (ClassNotFoundException e) {
-					throw new PictionaryServerException("Name validation exception");
+					throw new PictionaryException("Name validation exception");
 				}
 
 			} else {
 				userId = userDeclaredName;
+				server.addUserToGame(userDeclaredName);
+				sendMessageFromServerToClient("NameValidation", "OK");
 			}
 		} else {
-			throw new PictionaryServerException("Message dosent contain name attribute.");
+			throw new PictionaryException("Message dosent contain name attribute.");
 		}
 
 	}
 
-	public void sendMessageFromServerToClient(String messageType, String message) throws PictionaryServerException {
+	public void sendMessageFromServerToClient(String messageType, String message)
+			throws IOException, PictionaryException {
 		try {
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode node = mapper.createObjectNode();
-			((ObjectNode) node).put("sender", "server");
-			((ObjectNode) node).put("receiver", "client");
-			((ObjectNode) node).put("messageType", messageType);
-			((ObjectNode) node).put("message", message);
-			String nameValidationMessage = mapper.writeValueAsString(node);
-			sendMessageToClient(nameValidationMessage);
-
+			String jsonMessage = PictionaryProtocolParser.createProtocolMessage("server", "client", messageType,
+					message);
+			sendMessageDirectlyToHandledClient(jsonMessage);
 		} catch (JsonProcessingException exception) {
-			System.out.println("JSON wrapping went wrong");
-			throw new PictionaryServerException();
+			throw new PictionaryException("Wrong message atributes");
 		}
 	}
 
-	public void sendMessageToClient(String message) throws PictionaryServerException {
-		try {
-			outputStream.writeObject(message);
-		} catch (IOException exception) {
-			throw new PictionaryServerException("Server failed, connection lost");
-		}
+	public void sendMessageDirectlyToHandledClient(String message) throws IOException {
+		outputStream.writeObject(message);
 	}
 
-	public void parseProtocolMessage(String plainMessage) throws PictionaryServerException, IOException {
-		HashMap<pictionaryProtocolPool, String> messageInfo = pictionaryProtocolParser.parseProtocol(plainMessage);
-		String sender = messageInfo.get(pictionaryProtocolPool.SENDER);
-		String receiver = messageInfo.get(pictionaryProtocolPool.RECEIVER);
-
+	public void parseProtocolMessage(String plainMessage) throws PictionaryException, IOException {
+		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
+		String sender = messageInfo.get(PictionaryProtocolPool.SENDER);
+		String receiver = messageInfo.get(PictionaryProtocolPool.RECEIVER);
+		System.out.println(plainMessage);
+		
 		if (sender.equals(userId)) {
 			if (receiver.equals("broadcast")) {
-				for (ClientHandler handler : server.getUsers()) {
-					if (!handler.equals(this)) {
-						handler.sendMessageToClient(plainMessage);
+				server.sendBroadcastMessage(sender, plainMessage);
 
-					}
-				}
 			} else if (receiver.equals("server")) {
-				if (messageInfo.get(pictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
+				if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
 
-					if (messageInfo.get(pictionaryProtocolPool.MESSAGE).equals("disconected")) {
+					if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("disconected")) {
 						diconnectClient();
 					}
+				} else if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("guessedWord")) {
+					System.out.println(plainMessage);
 				}
+
 			} else {
-				for (ClientHandler handler : server.getUsers()) {
-					if (handler.getUserId().equals(receiver)) {
-						handler.sendMessageToClient(plainMessage);
-					}
-				}
+				server.sendMessageToClient(receiver, plainMessage);
 			}
 
 		}
@@ -315,7 +321,7 @@ class ClientHandler implements Runnable {
 
 	@Override
 	public String toString() {
-		return "Handler of" + userId + "\n";
+		return "Handler of " + userId + "\n";
 
 	}
 

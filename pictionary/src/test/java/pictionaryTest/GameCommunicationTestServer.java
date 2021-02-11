@@ -1,6 +1,6 @@
 package pictionaryTest;
 
-import pictionary.GameCommunication;
+import server_side.GameCommunication;
 
 public class GameCommunicationTestServer implements GameCommunication{
 
@@ -18,6 +18,13 @@ public class GameCommunicationTestServer implements GameCommunication{
 	@Override
 	public void sendHostInfo(String userId, String word) {
 		System.out.println("Sent host info to " +userId + " and gueess word: " + word);
+		
+	}
+
+
+	@Override
+	public void startGame() {
+		// TODO Auto-generated method stub
 		
 	}
 
