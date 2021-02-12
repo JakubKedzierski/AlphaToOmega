@@ -48,10 +48,13 @@ public class ClientStartUpDialogController {
 		}catch(InterruptedException e) {}
 		
 		if(app.getClient().isValidUsername()) {
-			app.startGame();
+			app.waitForOtherPlayers();
 		}else {
 			invalidUsername();
 		}
+	}
+	public void start() {
+		app.startGame();
 	}
 
 }

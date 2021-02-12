@@ -7,6 +7,7 @@ import client_side.gui.view_controller.GameInterfaceController;
 
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -62,6 +63,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 			AnchorPane clientStartUpDialog = (AnchorPane) loader.load();
 			rootLayout.setCenter(null);
 			rootLayout.setCenter(clientStartUpDialog);
+			primaryStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -77,12 +79,16 @@ public class PictionaryClientApp extends Application implements ClientApp {
 			loader.setLocation(PictionaryClientApp.class.getResource("gui/view_controller/GameInterface.fxml"));
 			AnchorPane gameInterface = (AnchorPane) loader.load();
 
-			rootLayout.setCenter(null);
-			rootLayout.setCenter(gameInterface);
 			GameInterfaceController controller = loader.getController();
 			
 			controller.setClient(client);
 			client.setGuiController(controller);
+			
+			Platform.runLater(()-> {
+					rootLayout.setCenter(gameInterface);	
+				});
+			
+
 
 		} catch (IOException e) {
 			e.printStackTrace();

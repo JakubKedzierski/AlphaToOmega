@@ -14,11 +14,12 @@ import server_side.pictionary.PictionaryRound;
 @RunWith(MockitoJUnitRunner.class)
 public class PictionaryRoundTest {
 
-	@Mock
-	Pictionary game;
+	PictionaryTestClass game;
 
 	@Before
 	public void setUp() {
+		GameCommunicationTestServer test = new GameCommunicationTestServer();
+		game=new PictionaryTestClass(test);
 		if (game == null)
 			throw new RuntimeException();
 	}
@@ -26,18 +27,31 @@ public class PictionaryRoundTest {
 	@Test
 	public void checkRoundDurationAndWordGuess() throws IndexOutOfBoundsException
 	{
-		PictionaryRound round = new PictionaryRound(400, "test", game);
+		PictionaryRound round = new PictionaryRound(500, "test", game);
 		assertEquals(true, round.isRunning());
 		assertEquals(false, round.guessedWord("wrong word"));
 		assertEquals(true, round.guessedWord("test"));
 		assertEquals(true, round.guessedWord("test"));
 		try {
+			Thread.sleep(round.getRoundTime() - 200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(false, game.isRoundEnded());
+		assertEquals(true, round.isRunning());
+		
+		try {
 			Thread.sleep(round.getRoundTime() + 200);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
 		assertEquals(false, round.isRunning());
 		assertEquals(2, round.getGoodGuessCount());
+		assertEquals(true, game.isRoundEnded());
+		round = new PictionaryRound(500, "test", game);
+		assertEquals(true, round.isRunning());
 	}
 
 }

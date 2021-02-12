@@ -7,10 +7,9 @@ import lombok.Getter;
 import server_side.GameCommunication;
 import server_side.PictionaryException;
 
-
-public class Pictionary implements PictionaryInterface{
+public class Pictionary implements PictionaryInterface {
 	private int NUMBER_OF_PLAYERS = 2;
-	private int NUMBER_OF_ROUNDS = 4;
+	private int NUMBER_OF_ROUNDS = 2;
 
 	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
 	private ArrayList<PictionaryPlayer> users;
@@ -37,8 +36,12 @@ public class Pictionary implements PictionaryInterface{
 	}
 
 	public void addUser(String name) {
-		PictionaryPlayer player = new PictionaryPlayer(name);
-		users.add(player);
+		if (users.size() < NUMBER_OF_PLAYERS) {
+			PictionaryPlayer player = new PictionaryPlayer(name);
+			users.add(player);
+		} else {
+			throw new IllegalArgumentException("MAX users in game already");
+		}
 	}
 
 	public void deleteUser(String name) {
@@ -60,30 +63,31 @@ public class Pictionary implements PictionaryInterface{
 
 	private void gameLoop() {
 		chooseNewHost();
-		round = new PictionaryRound(wordDatabase[roundCount],this);
+		round = new PictionaryRound(wordDatabase[roundCount], this);
 		roundCount++;
 	}
 
 	private void chooseNewHost() {
-		for(int i=0;i<users.size();i++) {
+		for (int i = 0; i < users.size(); i++) {
 			PictionaryPlayer player = users.get(i);
-			
-			if(i==roundCount) {
+
+			if (i == roundCount) {
 				player.setTypeOfPlayer("host");
 				try {
-					server.sendHostInfo(player.getName(), wordDatabase[roundCount]);
+					server.sendGameInfo(player.getName(), "host");
+					server.sendGameInfo(player.getName(), "word:" + wordDatabase[roundCount]);
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
-				} 
+				}
 			}
-			
+
 			else {
 				player.setTypeOfPlayer("listener");
 				try {
-					server.sendListenerInfo(users.get(i).getName());
+					server.sendGameInfo(player.getName(), "listener");
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
-				} 
+				}
 			}
 		}
 
@@ -91,11 +95,14 @@ public class Pictionary implements PictionaryInterface{
 
 	public boolean checkWord(String word, String name) {
 		PictionaryPlayer player = getUserByName(name);
-		
-		if(player==null) throw new IllegalArgumentException("Player not found");
-		if(player.getTypeOfPlayer().equals("host")) throw new IllegalArgumentException("Player is host");
-		if(player.isGoodGuessAlreadyDone()) throw new IllegalArgumentException("Player already made a guess");
-			
+
+		if (player == null)
+			throw new IllegalArgumentException("Player not found");
+		if (player.getTypeOfPlayer().equals("host"))
+			throw new IllegalArgumentException("Player is host");
+		if (player.isGoodGuessAlreadyDone())
+			throw new IllegalArgumentException("Player already made a guess");
+
 		if (round.guessedWord(word)) {
 			player.addPoints(2);
 			player.setGoodGuessAlreadyDone(true);
@@ -104,34 +111,43 @@ public class Pictionary implements PictionaryInterface{
 		return false;
 	}
 
-
 	public void roundEnded() {
 		PictionaryPlayer host = getHost();
 		host.addPoints(round.getGoodGuessCount());
-		
-		for(PictionaryPlayer player:users) {
+
+		for (PictionaryPlayer player : users) {
 			player.setGoodGuessAlreadyDone(false);
+			try {
+				server.sendGameInfo(player.getName(), "round ended");
+			} catch (PictionaryException | IOException  e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		
 
 		if (roundCount < NUMBER_OF_ROUNDS) {
 			gameLoop();
 		} else {
-			gameRunning = false;
 			
+			gameRunning = false;
 			try {
-				server.sendEndGameInfo();
+				for (PictionaryPlayer player : users) {
+					server.sendGameInfo(player.getName(), "game ended");
+				}
 			} catch (PictionaryException | IOException cirticalException) {
 				cleanUpAndUnexpectedEndGame();
 			}
-		
+
 		}
 	}
-	
+
 	public void cleanUpAndUnexpectedEndGame() {
+		if (round.isRunning())
+			round.endRound();
 		gameRunning = false; // clean up and end game
-		
 	}
-	
+
 	public PictionaryPlayer getUserByName(String name) {
 		for (PictionaryPlayer player : users) {
 			if (player.getName().equals(name)) {
@@ -140,7 +156,7 @@ public class Pictionary implements PictionaryInterface{
 		}
 		return null;
 	}
-	
+
 	public PictionaryPlayer getHost() {
 		for (PictionaryPlayer player : users) {
 			if (player.getTypeOfPlayer().equals("host")) {

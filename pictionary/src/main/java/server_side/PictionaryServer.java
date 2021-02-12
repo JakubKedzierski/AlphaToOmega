@@ -73,11 +73,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void startGame() {
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(3000); 
 			String jsonMessage = PictionaryProtocolParser.createProtocolMessage("server", "broadcast", "gameInfo","StartGame");
 			sendBroadcastMessage("server", jsonMessage);
+			game.startGame();
 		} catch (IOException | PictionaryException | InterruptedException  e) {
-			System.out.println("rzucam");
 			e.printStackTrace();
 		}
 
@@ -128,33 +128,15 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		return nameList;
 	}
 
-	@Override
-	public void sendHostInfo(String userId, String word) throws IOException, PictionaryException {
+	public void sendGameInfo(String userId,String gameInfo) throws PictionaryException, IOException
+	{
 		ClientHandler handler = getClientHandlerById(userId);
-		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"host\"}");
-		handler.sendMessageFromServerToClient("gameInfo", "{\"word\":\"" + word + "\"}");
-	}
-
-	@Override
-	public void sendListenerInfo(String userId) throws PictionaryException, IOException {
-		ClientHandler handler = getClientHandlerById(userId);
-		handler.sendMessageFromServerToClient("gameInfo", "{\"typeOfPlayer\":\"listener\"}");
-	}
-
-	@Override
-	public void sendEndGameInfo() throws PictionaryException, IOException {
-		for (ClientHandler handler : users) {
-			handler.sendMessageFromServerToClient("gameInfo", "game ended");
-		}
-
+		handler.sendMessageFromServerToClient("gameInfo", gameInfo);
 	}
 
 	public void sendMessageToClient(String username, String message) throws IOException {
-		for (ClientHandler handler : users) {
-			if (handler.getUserId().equals(username)) {
-				handler.sendMessageDirectlyToHandledClient(message);
-			}
-		}
+		ClientHandler handler = getClientHandlerById(username);
+		handler.sendMessageDirectlyToHandledClient(message);
 	}
 
 	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {

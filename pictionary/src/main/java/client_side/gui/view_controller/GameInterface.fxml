@@ -37,7 +37,7 @@
                                           <Insets left="10.0" right="120.0" />
                                        </GridPane.margin>
                                     </TextField>
-                                    <Button mnemonicParsing="false" onAction="#guessWord" prefHeight="36.0" prefWidth="109.0" text="guess word" textAlignment="CENTER" GridPane.rowIndex="2">
+                                    <Button fx:id="guessWordButton" mnemonicParsing="false" onAction="#guessWord" prefHeight="36.0" prefWidth="109.0" text="guess word" textAlignment="CENTER" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets left="170.0" />
                                        </GridPane.margin>
@@ -56,7 +56,7 @@
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
                   <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="6.0" prefHeight="119.0" prefWidth="886.0" />
-                  <TextField fx:id="messageTypedInField" layoutX="22.0" layoutY="123.0" prefHeight="39.0" prefWidth="800.0" />
+                  <TextField fx:id="messageTypedInField" layoutX="22.0" layoutY="123.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="800.0" />
                   <Button layoutX="820.0" layoutY="123.0" mnemonicParsing="false" onAction="#sendMessage" onMouseDragReleased="#sendMessage" prefHeight="39.0" prefWidth="87.0" text="SEND">
                      <font>
                         <Font size="15.0" />

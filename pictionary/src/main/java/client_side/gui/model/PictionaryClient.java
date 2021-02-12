@@ -157,6 +157,14 @@ public class PictionaryClient implements Runnable {
 			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("StartGame")) {
 				app.startGame();
 			}
+			
+			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("host")) {
+				guiController.setHostView();
+			}
+			
+			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("listener")) {
+				guiController.setListenerView();
+			}
 			break;
 
 		case "pixelVector":

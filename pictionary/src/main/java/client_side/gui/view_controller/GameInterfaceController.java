@@ -5,9 +5,11 @@ import client_side.gui.model.PictionaryClient;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import lombok.Setter;
 import server_side.PictionaryException;
 
@@ -18,11 +20,11 @@ public class GameInterfaceController {
 	@FXML private TextArea messageConsoleField;	
 	@FXML private TextField messageTypedInField;
 	@FXML private TextField guessWordField;
+	@FXML private Button guessWordButton;
 	
 
 	@FXML
 	private void initialize() {
-		Platform.setImplicitExit(false);
 		
 		messageTypedInField.textProperty()
 				.addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
@@ -41,6 +43,13 @@ public class GameInterfaceController {
 		);
 
 	}
+	@FXML
+	public void sendMessageOnEnterPressed(KeyEvent event) {
+		if(event.getCode().equals(KeyCode.ENTER)) {
+			sendMessage();
+		}
+	}
+	
 
 	@FXML
 	public void sendMessage() {
@@ -48,6 +57,7 @@ public class GameInterfaceController {
 			try {
 				client.sendMessage("chat", messageTypedInField.getText(), "broadcast");
 				messageTypedInField.setText("");
+				messageConsoleField.appendText(messageTypedInField.getText()+"\n");
 			} catch (PictionaryException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,6 +76,16 @@ public class GameInterfaceController {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void setHostView() {
+		guessWordField.setDisable(true);
+		guessWordButton.setDisable(true);
+	}
+	
+	public void setListenerView() {
+		guessWordField.setDisable(false);
+		guessWordButton.setDisable(false);
 	}
 	
 

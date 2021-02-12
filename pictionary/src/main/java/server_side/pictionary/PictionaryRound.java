@@ -1,10 +1,8 @@
 package server_side.pictionary;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-
-import javax.swing.Timer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lombok.Getter;
 
@@ -12,7 +10,7 @@ public class PictionaryRound{
 	private String wordToGuess;
 	private Timer timer;
 	private @Getter boolean running = false;
-	private @Getter long roundTime = 1 * 1000;
+	private @Getter long roundTime = 50 * 1000;
 	private @Getter int goodGuessCount = 0;
 	private PictionaryInterface pictionary;  // to make callback after round ends
 
@@ -23,28 +21,24 @@ public class PictionaryRound{
 		this.pictionary=pictionary;
 		
 		running = true;
-		timer = new Timer((int) roundTime, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				endRound();
-			}
-		});
+	    TimerTask task = new TimerTask() {
+	        public void run() {
+	        	endRound();
+	        }
+	    };
 		
-		timer.setInitialDelay(100);
-		timer.setRepeats(false); 
-		startRound();
+		timer = new Timer();
+		timer.schedule(task, roundTime);
 	}
 
 	public PictionaryRound(String wordToGuess,PictionaryInterface pictionary) {
-		this(1 * 1000, wordToGuess,pictionary);
+		this(10 * 1000, wordToGuess,pictionary);
 	}
 	
-	public void startRound() {
-		if(!timer.isRunning()) timer.start();
-	}
 
 	public void endRound() {
 		running = false;
+		timer.cancel();timer.purge();
 		pictionary.roundEnded();
 	}
 	
