@@ -1,4 +1,4 @@
-package pictionaryTest;
+package pictionaryMockClasses;
 
 import lombok.Getter;
 import server_side.GameCommunication;

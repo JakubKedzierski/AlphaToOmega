@@ -1,4 +1,4 @@
-package pictionaryTest;
+package pictionaryMockClasses;
 
 import java.io.IOException;
 

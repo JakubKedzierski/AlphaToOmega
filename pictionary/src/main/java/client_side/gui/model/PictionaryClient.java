@@ -165,6 +165,20 @@ public class PictionaryClient implements Runnable {
 			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("listener")) {
 				guiController.setListenerView();
 			}
+			
+			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).startsWith("round:")) {
+				guiController.showRound(messageInfo.get(PictionaryProtocolPool.MESSAGE).substring(6));
+			}
+			
+			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).startsWith("word:")) {
+				guiController.showWordToGuess(messageInfo.get(PictionaryProtocolPool.MESSAGE).substring(5));
+			}
+			
+			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("game ended")) {
+				guiController.endGame();
+			}
+			
+			
 			break;
 
 		case "pixelVector":
@@ -179,7 +193,6 @@ public class PictionaryClient implements Runnable {
 		case "NameValidation":
 			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("InvalidName")) {
 				validUsername = false;
-				resolveNameValidation();
 			}
 
 			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("OK")) {
@@ -193,16 +206,6 @@ public class PictionaryClient implements Runnable {
 
 	}
 
-	public void resolveNameValidation() throws PictionaryException {
-
-		System.out.println("name validation start");
-
-		try {
-			sendMessage("NameValidation", username, "server");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public void sendMessage(String messageType, String message, String receiver)
 			throws PictionaryException, IOException {

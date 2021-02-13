@@ -1,4 +1,4 @@
-package pictionaryTest;
+package GameTests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import pictionaryMockClasses.GameCommunicationTestServer;
+import pictionaryMockClasses.PictionaryTestClass;
 import server_side.pictionary.Pictionary;
 import server_side.pictionary.PictionaryRound;
 

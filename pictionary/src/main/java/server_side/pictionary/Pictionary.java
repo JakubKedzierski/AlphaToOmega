@@ -75,6 +75,7 @@ public class Pictionary implements PictionaryInterface {
 				player.setTypeOfPlayer("host");
 				try {
 					server.sendGameInfo(player.getName(), "host");
+					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
 					server.sendGameInfo(player.getName(), "word:" + wordDatabase[roundCount]);
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
@@ -85,6 +86,7 @@ public class Pictionary implements PictionaryInterface {
 				player.setTypeOfPlayer("listener");
 				try {
 					server.sendGameInfo(player.getName(), "listener");
+					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
 				}

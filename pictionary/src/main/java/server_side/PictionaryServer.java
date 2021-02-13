@@ -26,7 +26,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	public static int PLAYERS_TO_START_GAME = 2;
 	private @Getter boolean serverRunning = false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
+	private @Getter int validUsers=0;
 	private Pictionary game = null;
+	private ServerSocket serverSocket=null;
 
 	public PictionaryServer() {
 		new Thread(this).start();
@@ -36,9 +38,21 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		new PictionaryServer();
 
 	}
+	
+	private void listetningLoop() throws IOException {
+		while (users.size() < PLAYERS_TO_START_GAME) {
+			Socket clientSocket = serverSocket.accept();
+			if (clientSocket != null) {
+				System.out.println("Connection accepted");
+				ClientHandler userHandler = new ClientHandler(this, clientSocket);
+				users.add(userHandler);
+			}
+		}
+	}
 
 	public void run() {
 		try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
+			this.serverSocket=serverSocket;
 			serverRunning = true;
 			int port = serverSocket.getLocalPort();
 			String address = InetAddress.getLocalHost().getHostAddress();
@@ -47,17 +61,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 			
 			game = new Pictionary(this);
 
-			while (users.size() < PLAYERS_TO_START_GAME) {
-				Socket clientSocket = serverSocket.accept();
-				if (clientSocket != null) {
-					System.out.println("Connection accepted");
-					ClientHandler userHandler = new ClientHandler(this, clientSocket);
-					users.add(userHandler);
-				}
-			}
+			listetningLoop();
 
-			startGame();
 			while (serverRunning) { // to keep thread alive and server socket open
+				if(users.size()<PLAYERS_TO_START_GAME) listetningLoop();
 			}
 
 		} catch (IOException ioException) {
@@ -69,6 +76,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void addUserToGame(String name) {
 		game.addUser(name);
+		validUsers++;
+		if(validUsers==PLAYERS_TO_START_GAME) {
+			startGame();
+		}
 	}
 
 	public void startGame() {
@@ -85,7 +96,6 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void disconnectServer() {
 		serverRunning = false;
-		// inform clients about disconnection if there are clients + end up game
 	}
 
 	public ClientHandler getClientHandlerById(final String id) {
@@ -117,6 +127,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void removeHandler(ClientHandler clientHandler) {
 		users.remove(clientHandler);
+		validUsers--;
 	}
 
 	public ArrayList<String> getUsersIdList() {
@@ -220,7 +231,7 @@ class ClientHandler implements Runnable {
 	private void newConnectionStartup(String message) throws PictionaryException, IOException {
 
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(message);
-
+		System.out.println(message);
 		if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
 
 			String userDeclaredName = messageInfo.get(PictionaryProtocolPool.MESSAGE);
@@ -232,14 +243,15 @@ class ClientHandler implements Runnable {
 					String userNewName;
 					userNewName = (String) inputStream.readObject();
 					newConnectionStartup(userNewName);
+					return;
 				} catch (ClassNotFoundException e) {
 					throw new PictionaryException("Name validation exception");
 				}
 
 			} else {
 				userId = userDeclaredName;
-				server.addUserToGame(userDeclaredName);
 				sendMessageFromServerToClient("NameValidation", "OK");
+				server.addUserToGame(userDeclaredName);
 			}
 		} else {
 			throw new PictionaryException("Message dosent contain name attribute.");
