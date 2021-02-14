@@ -4,7 +4,10 @@ import java.io.IOException;
 import client_side.gui.model.PictionaryClient;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -13,6 +16,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import lombok.Setter;
 import server_side.PictionaryException;
 
@@ -36,6 +42,9 @@ public class GameInterfaceController {
 	private Label timeLeftLabel;
 	@FXML
 	private Label usernameLabel;
+	@FXML
+	private Canvas drawingBoardCanvas;
+	@FXML private AnchorPane listeningPane;
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -59,7 +68,8 @@ public class GameInterfaceController {
 				.addListener((ObservableValue<?> observable, Object oldValue, Object newValue) -> {
 					messageConsoleField.setScrollTop(Double.MAX_VALUE);
 				});
-
+		
+		listeningPane.setFocusTraversable(true);
 	}
 
 	@FXML
@@ -71,6 +81,7 @@ public class GameInterfaceController {
 
 	@FXML
 	public void sendMessage() {
+		
 		if (messageTypedInField.getText() != null || messageTypedInField.getText().length() != 0) {
 			try {
 				client.sendMessage("chat", messageTypedInField.getText(), "broadcast");
@@ -95,6 +106,16 @@ public class GameInterfaceController {
 			}
 		}
 	}
+	
+	
+	
+	@FXML
+	public void drawRectangle(MouseEvent mouse) {
+		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
+		gc.setFill(Color.BLACK);
+		gc.fillRect(mouse.getX(), mouse.getY(), 5, 5);
+	}
+	
 
 	public void showWordToGuess(String word) {
 		Platform.runLater(() -> {
@@ -141,6 +162,7 @@ public class GameInterfaceController {
 			roundLabel.setText(round);
 		});
 	}
+	
 
 	public void addMessage(String message) {
 

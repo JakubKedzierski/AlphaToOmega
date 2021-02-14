@@ -41,6 +41,9 @@ public class ClientStartUpDialogController {
 		if(usernameField.getText() == null || usernameField.getText().length()==0){
 			invalidUsername(); return;
 		}
+		
+		if(usernameField.getText().equals("test")) app.startGame();
+		
 		app.getClient().validateName(usernameField.getText());		
 		
 		try {
