@@ -105,6 +105,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Pictionary");
+		this.primaryStage.setResizable(false);
 		client = new PictionaryClient(this);
 		
 		initRootLayout();

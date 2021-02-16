@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -44,7 +45,7 @@ public class GameInterfaceController {
 	private Label usernameLabel;
 	@FXML
 	private Canvas drawingBoardCanvas;
-	@FXML private AnchorPane listeningPane;
+	
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -69,7 +70,6 @@ public class GameInterfaceController {
 					messageConsoleField.setScrollTop(Double.MAX_VALUE);
 				});
 		
-		listeningPane.setFocusTraversable(true);
 	}
 
 	@FXML
@@ -85,8 +85,8 @@ public class GameInterfaceController {
 		if (messageTypedInField.getText() != null || messageTypedInField.getText().length() != 0) {
 			try {
 				client.sendMessage("chat", messageTypedInField.getText(), "broadcast");
+				messageConsoleField.appendText(usernameLabel.getText()+ ": "+messageTypedInField.getText() + "\n");
 				messageTypedInField.setText("");
-				messageConsoleField.appendText(messageTypedInField.getText() + "\n");
 			} catch (PictionaryException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -111,6 +111,8 @@ public class GameInterfaceController {
 	
 	@FXML
 	public void drawRectangle(MouseEvent mouse) {
+		if(typeOfPlayerLabel.getText().equals("listener")) return;
+		
 		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
 		gc.fillRect(mouse.getX(), mouse.getY(), 5, 5);
