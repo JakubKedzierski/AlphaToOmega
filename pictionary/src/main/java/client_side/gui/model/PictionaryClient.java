@@ -41,7 +41,7 @@ public class PictionaryClient implements Runnable {
 	private ClientApp app;
 
 	public PictionaryClient(ClientApp app) {
-		this.app=app;
+		this.app = app;
 		clientType = false;
 	}
 
@@ -87,10 +87,10 @@ public class PictionaryClient implements Runnable {
 
 		new Thread(this).start();
 	}
-	
+
 	public void validateName(String username) {
 		try {
-			this.username=username;
+			this.username = username;
 			sendMessage("NameValidation", username, "server");
 		} catch (PictionaryException | IOException exception) {
 			exception.printStackTrace();
@@ -139,7 +139,9 @@ public class PictionaryClient implements Runnable {
 	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryException {
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
 		String messageType = messageInfo.get(PictionaryProtocolPool.MESSAGETYPE);
-		System.out.println(plainMessage);
+		String message = messageInfo.get(PictionaryProtocolPool.MESSAGE);
+		
+		// System.out.println(username +"| " + plainMessage);
 
 		switch (messageType) {
 
@@ -154,27 +156,31 @@ public class PictionaryClient implements Runnable {
 			break;
 
 		case "gameInfo":
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("StartGame")) {
+			if (message.equals("StartGame")) {
 				app.startGame();
 			}
 			
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("host")) {
+			if (message.equals("host")) {
 				guiController.setHostView();
 			}
 			
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("listener")) {
+			if (message.equals("listener")) {
 				guiController.setListenerView();
 			}
 			
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).startsWith("round:")) {
-				guiController.showRound(messageInfo.get(PictionaryProtocolPool.MESSAGE).substring(6));
+			if (message.startsWith("round:")) {
+				guiController.showRound(message.substring(6));
 			}
 			
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).startsWith("word:")) {
-				guiController.showWordToGuess(messageInfo.get(PictionaryProtocolPool.MESSAGE).substring(5));
+			if (message.startsWith("word:")) {
+				guiController.showWordToGuess(message.substring(5));
 			}
 			
-			if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("game ended")) {
+			if (message.startsWith("goodGuess")) {
+				guiController.goodGuessDone();
+			}
+			
+			if (message.equals("game ended")) {
 				guiController.endGame();
 			}
 			
@@ -182,9 +188,9 @@ public class PictionaryClient implements Runnable {
 			break;
 
 		case "pixelVector":
-			break;
-
-		case "guessedWord":
+			String x =message.substring(0, message.indexOf(":"));
+			String y = message.substring(message.indexOf(":") + 1);
+			guiController.drawImageFromHost(Double.parseDouble(x),Double.parseDouble(y));
 			break;
 
 		case "Error":
@@ -205,7 +211,6 @@ public class PictionaryClient implements Runnable {
 		}
 
 	}
-
 
 	public void sendMessage(String messageType, String message, String receiver)
 			throws PictionaryException, IOException {

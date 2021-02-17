@@ -100,7 +100,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public ClientHandler getClientHandlerById(final String id) {
 		for (ClientHandler handler : users) {
-			if (handler.getUserId() == id) {
+			if (handler.getUsername() == id) {
 				return handler;
 			}
 		}
@@ -109,7 +109,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public boolean isNameTaken(String userName) {
 		for (ClientHandler handler : users) {
-			if (userName.equals(handler.getUserId())) {
+			if (userName.equals(handler.getUsername())) {
 				return true;
 			}
 		}
@@ -133,7 +133,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	public ArrayList<String> getUsersIdList() {
 		ArrayList<String> nameList = new ArrayList<String>();
 		for (ClientHandler handler : users) {
-			String name = handler.getUserId();
+			String name = handler.getUsername();
 			nameList.add(name);
 		}
 		return nameList;
@@ -152,10 +152,15 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {
 		for (ClientHandler handler : users) {
-			if (!handler.getUserId().equals(senderUsername)) {
+			if (!handler.getUsername().equals(senderUsername)) {
 				handler.sendMessageDirectlyToHandledClient(message);
 			}
 		}
+	}
+
+	@Override
+	public void checkWord(String word,String username) {
+		game.checkWord(word, username);
 	}
 
 }
@@ -163,7 +168,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 @EqualsAndHashCode
 class ClientHandler implements Runnable {
 
-	private @Getter @Setter String userId = null;
+	private @Getter @Setter String username = null;
 	private ServerHandlerInterface server = null;
 	private @Getter Socket socket = null;
 	private ObjectInputStream inputStream = null;
@@ -225,7 +230,7 @@ class ClientHandler implements Runnable {
 
 		}
 
-		userId = userDeclaredName;
+		username = userDeclaredName;
 	}
 
 	private void newConnectionStartup(String message) throws PictionaryException, IOException {
@@ -249,7 +254,7 @@ class ClientHandler implements Runnable {
 				}
 
 			} else {
-				userId = userDeclaredName;
+				username = userDeclaredName;
 				sendMessageFromServerToClient("NameValidation", "OK");
 				server.addUserToGame(userDeclaredName);
 			}
@@ -278,22 +283,22 @@ class ClientHandler implements Runnable {
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
 		String sender = messageInfo.get(PictionaryProtocolPool.SENDER);
 		String receiver = messageInfo.get(PictionaryProtocolPool.RECEIVER);
-		System.out.println(plainMessage);
+		String message =  messageInfo.get(PictionaryProtocolPool.MESSAGE);
 		
-		if (sender.equals(userId)) {
+		if (sender.equals(username)) {
 			if (receiver.equals("broadcast")) {
 				server.sendBroadcastMessage(sender, plainMessage);
 
 			} else if (receiver.equals("server")) {
 				if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("Error")) {
 
-					if (messageInfo.get(PictionaryProtocolPool.MESSAGE).equals("disconected")) {
+					if (message.equals("disconected")) {
 						diconnectClient();
 					}
+					
 				} else if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("guessedWord")) {
-					System.out.println(plainMessage);
+					server.checkWord(message,username);
 				}
-
 			} else {
 				server.sendMessageToClient(receiver, plainMessage);
 			}
@@ -315,7 +320,7 @@ class ClientHandler implements Runnable {
 
 	@Override
 	public String toString() {
-		return "Handler of " + userId + "\n";
+		return "Handler of " + username + "\n";
 
 	}
 

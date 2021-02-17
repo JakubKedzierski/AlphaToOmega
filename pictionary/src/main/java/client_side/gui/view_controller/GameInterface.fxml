@@ -25,7 +25,10 @@
             <RowConstraints maxHeight="442.0" minHeight="10.0" prefHeight="208.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="711.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" width="906.0" />
+            <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="647.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" width="878.0">
+               <GridPane.margin>
+                  <Insets left="20.0" top="25.0" />
+               </GridPane.margin></Canvas>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" GridPane.rowIndex="1">
                <children>
                   <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="6.0" prefHeight="119.0" prefWidth="886.0" />

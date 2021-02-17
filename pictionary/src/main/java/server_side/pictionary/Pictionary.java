@@ -108,6 +108,12 @@ public class Pictionary implements PictionaryInterface {
 		if (round.guessedWord(word)) {
 			player.addPoints(2);
 			player.setGoodGuessAlreadyDone(true);
+			try {
+				server.sendGameInfo(player.getName(), "goodGuess");
+			} catch (PictionaryException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		}
 		return false;

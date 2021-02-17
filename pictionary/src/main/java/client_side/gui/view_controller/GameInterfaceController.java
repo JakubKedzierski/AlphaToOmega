@@ -45,7 +45,6 @@ public class GameInterfaceController {
 	private Label usernameLabel;
 	@FXML
 	private Canvas drawingBoardCanvas;
-	
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -69,7 +68,7 @@ public class GameInterfaceController {
 				.addListener((ObservableValue<?> observable, Object oldValue, Object newValue) -> {
 					messageConsoleField.setScrollTop(Double.MAX_VALUE);
 				});
-		
+
 	}
 
 	@FXML
@@ -81,11 +80,11 @@ public class GameInterfaceController {
 
 	@FXML
 	public void sendMessage() {
-		
+
 		if (messageTypedInField.getText() != null || messageTypedInField.getText().length() != 0) {
 			try {
 				client.sendMessage("chat", messageTypedInField.getText(), "broadcast");
-				messageConsoleField.appendText(usernameLabel.getText()+ ": "+messageTypedInField.getText() + "\n");
+				messageConsoleField.appendText(usernameLabel.getText() + ": " + messageTypedInField.getText() + "\n");
 				messageTypedInField.setText("");
 			} catch (PictionaryException | IOException e) {
 				// TODO Auto-generated catch block
@@ -106,18 +105,38 @@ public class GameInterfaceController {
 			}
 		}
 	}
-	
-	
-	
+
 	@FXML
 	public void drawRectangle(MouseEvent mouse) {
-		if(typeOfPlayerLabel.getText().equals("listener")) return;
-		
+		if (typeOfPlayerLabel.getText().equals("listener"))
+			return;
+
 		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
-		gc.fillRect(mouse.getX(), mouse.getY(), 5, 5);
+		gc.fillRect(mouse.getX(), mouse.getY(), 6, 6);
+		try {
+			client.sendMessage("pixelVector", mouse.getX() + ":" + mouse.getY(), "broadcast");
+		} catch (PictionaryException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
+
+	public void goodGuessDone() {
+		Platform.runLater(() -> {
+			guessWordButton.setDisable(true);
+			guessWordField.setDisable(true);
+		});
+	}
+
+	public void drawImageFromHost(double x, double y) {
+		if (typeOfPlayerLabel.getText().equals("host"))
+			return;
+
+		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
+		gc.setFill(Color.BLACK);
+		gc.fillRect(x, y, 6, 6);
+	}
 
 	public void showWordToGuess(String word) {
 		Platform.runLater(() -> {
@@ -164,7 +183,6 @@ public class GameInterfaceController {
 			roundLabel.setText(round);
 		});
 	}
-	
 
 	public void addMessage(String message) {
 
