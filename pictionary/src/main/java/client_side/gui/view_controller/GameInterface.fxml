@@ -33,20 +33,10 @@
                <children>
                   <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="6.0" prefHeight="119.0" prefWidth="886.0" />
                   <TextField fx:id="messageTypedInField" layoutX="22.0" layoutY="123.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="800.0" />
-                  <Button layoutX="820.0" layoutY="123.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" text="SEND">
+                  <Button layoutX="820.0" layoutY="123.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" text="send">
                      <font>
                         <Font size="15.0" />
                      </font></Button>
-                  <Label layoutX="1009.0" layoutY="36.0" text="username:">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="usernameLabel" layoutX="1009.0" layoutY="66.0" prefHeight="30.0" prefWidth="160.0">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
                </children></AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="710.0" prefWidth="307.0" GridPane.columnIndex="1">
                <children>
@@ -109,6 +99,30 @@
                         </Pane>
                      </children>
                   </GridPane>
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Label fx:id="usernameLabel" layoutX="75.0" layoutY="60.0" prefHeight="30.0" prefWidth="160.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="75.0" layoutY="30.0" text="username:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="userPointsLabel" layoutX="137.0" layoutY="96.0" prefHeight="30.0" prefWidth="28.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="75.0" layoutY="96.0" text="points:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
          </children>

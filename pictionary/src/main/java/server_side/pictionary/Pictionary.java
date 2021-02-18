@@ -2,6 +2,8 @@ package server_side.pictionary;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import lombok.Getter;
 import server_side.GameCommunication;
@@ -12,7 +14,7 @@ public class Pictionary implements PictionaryInterface {
 	private int NUMBER_OF_ROUNDS = 2;
 
 	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
-	private ArrayList<PictionaryPlayer> users;
+	private List<PictionaryPlayer> users;
 	private GameCommunication server;
 	private @Getter int roundCount;
 	private @Getter PictionaryRound round = null;
@@ -51,6 +53,11 @@ public class Pictionary implements PictionaryInterface {
 			}
 		}
 	}
+	
+	public PictionaryPlayer getWinner() {
+		PictionaryPlayer winner = Collections.max(users);
+		return winner;
+	}
 
 	public void startGame() {
 		if (users.size() == NUMBER_OF_PLAYERS && server != null) {
@@ -77,6 +84,7 @@ public class Pictionary implements PictionaryInterface {
 					server.sendGameInfo(player.getName(), "host");
 					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
 					server.sendGameInfo(player.getName(), "word:" + wordDatabase[roundCount]);
+					server.sendGameInfo(player.getName(), "points:"+player.getPoints());
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
 				}
@@ -87,6 +95,7 @@ public class Pictionary implements PictionaryInterface {
 				try {
 					server.sendGameInfo(player.getName(), "listener");
 					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
+					server.sendGameInfo(player.getName(), "points:"+player.getPoints());
 				} catch (PictionaryException | IOException cirticalException) {
 					cleanUpAndUnexpectedEndGame();
 				}
@@ -110,6 +119,7 @@ public class Pictionary implements PictionaryInterface {
 			player.setGoodGuessAlreadyDone(true);
 			try {
 				server.sendGameInfo(player.getName(), "goodGuess");
+				server.sendGameInfo(player.getName(), "points:"+player.getPoints());
 			} catch (PictionaryException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -140,8 +150,9 @@ public class Pictionary implements PictionaryInterface {
 			
 			gameRunning = false;
 			try {
+				PictionaryPlayer winner= getWinner();
 				for (PictionaryPlayer player : users) {
-					server.sendGameInfo(player.getName(), "game ended");
+					server.sendGameInfo(player.getName(), "game ended | winner:" + winner.getName());
 				}
 			} catch (PictionaryException | IOException cirticalException) {
 				cleanUpAndUnexpectedEndGame();

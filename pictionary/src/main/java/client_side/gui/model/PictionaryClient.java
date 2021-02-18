@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import client_side.PictionaryClientApp;
 import client_side.gui.view_controller.GameInterfaceController;
 import lombok.Getter;
@@ -180,8 +182,17 @@ public class PictionaryClient implements Runnable {
 				guiController.goodGuessDone();
 			}
 			
-			if (message.equals("game ended")) {
-				guiController.endGame();
+			if (message.startsWith("game ended")) {
+				String winner = message.substring(20);
+				guiController.endGame(winner);
+			}
+			
+			if(message.startsWith("points:")) {
+				guiController.setPoints(Integer.parseInt(message.substring(7)));
+			}
+			
+			if(message.equals("round ended")) {
+				guiController.cleanBoard();
 			}
 			
 			

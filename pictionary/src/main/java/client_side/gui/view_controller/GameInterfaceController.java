@@ -3,6 +3,8 @@ package client_side.gui.view_controller;
 import java.io.IOException;
 import client_side.gui.model.PictionaryClient;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -45,6 +47,8 @@ public class GameInterfaceController {
 	private Label usernameLabel;
 	@FXML
 	private Canvas drawingBoardCanvas;
+	@FXML
+	private Label userPointsLabel;
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -69,6 +73,7 @@ public class GameInterfaceController {
 					messageConsoleField.setScrollTop(Double.MAX_VALUE);
 				});
 
+		userPointsLabel.setText(Integer.toString(0));
 	}
 
 	@FXML
@@ -114,12 +119,20 @@ public class GameInterfaceController {
 		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
 		gc.fillRect(mouse.getX(), mouse.getY(), 6, 6);
+
 		try {
 			client.sendMessage("pixelVector", mouse.getX() + ":" + mouse.getY(), "broadcast");
 		} catch (PictionaryException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void cleanBoard() {
+		Platform.runLater(() -> {
+			GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
+			gc.clearRect(0, 0, drawingBoardCanvas.getWidth(), drawingBoardCanvas.getHeight());
+		});
 	}
 
 	public void goodGuessDone() {
@@ -148,13 +161,16 @@ public class GameInterfaceController {
 		});
 	}
 
-	public void endGame() {
+	public void endGame(String winner) {
 		Platform.runLater(() -> {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Game over");
 			alert.setHeaderText("Game over");
+			alert.setContentText("You get " + userPointsLabel.getText() + " points\n" +
+									"Winner of the game is: " + winner);
 			alert.showAndWait();
 		});
+		client.disconnect();
 	}
 
 	public void setHostView() {
@@ -181,6 +197,12 @@ public class GameInterfaceController {
 	public void showRound(String round) {
 		Platform.runLater(() -> {
 			roundLabel.setText(round);
+		});
+	}
+
+	public void setPoints(int points) {
+		Platform.runLater(() -> {
+			userPointsLabel.setText(Integer.toString(points));
 		});
 	}
 

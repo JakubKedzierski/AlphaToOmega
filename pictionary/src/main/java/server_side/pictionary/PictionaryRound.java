@@ -10,7 +10,7 @@ public class PictionaryRound{
 	private String wordToGuess;
 	private Timer timer;
 	private @Getter boolean running = false;
-	private @Getter long roundTime = 50 * 1000;
+	private @Getter long roundTime = 20 * 1000;
 	private @Getter int goodGuessCount = 0;
 	private PictionaryInterface pictionary;  // to make callback after round ends
 
