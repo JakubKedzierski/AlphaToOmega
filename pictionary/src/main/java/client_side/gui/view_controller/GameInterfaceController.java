@@ -13,6 +13,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
@@ -163,14 +164,21 @@ public class GameInterfaceController {
 
 	public void endGame(String winner) {
 		Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Game over");
-			alert.setHeaderText("Game over");
-			alert.setContentText("You get " + userPointsLabel.getText() + " points\n" +
-									"Winner of the game is: " + winner);
-			alert.showAndWait();
+			ButtonType endGame = new ButtonType("End game");
+			Alert a = new Alert(AlertType.NONE, "Game Over", endGame);
+			a.setTitle("Game over");
+			a.setHeaderText("Game over");
+			a.setResizable(false);
+			a.setContentText("You get " + userPointsLabel.getText() + " points\n" + "Winner of the game is: " + winner);
+			a.showAndWait().ifPresent(response -> {
+				if (response == endGame) {
+					client.disconnect();
+					Platform.exit();
+					System.exit(0);
+				}
+			});
 		});
-		client.disconnect();
+
 	}
 
 	public void setHostView() {

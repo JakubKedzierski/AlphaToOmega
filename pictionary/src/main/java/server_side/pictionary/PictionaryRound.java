@@ -32,7 +32,7 @@ public class PictionaryRound{
 	}
 
 	public PictionaryRound(String wordToGuess,PictionaryInterface pictionary) {
-		this(20 * 1000, wordToGuess,pictionary);
+		this(5 * 1000, wordToGuess,pictionary);
 	}
 	
 
