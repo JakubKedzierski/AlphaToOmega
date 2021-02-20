@@ -23,13 +23,18 @@ import server_side.pictionary.Pictionary;
 
 public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
 	public static int SERVER_PORT = 25000;
-	public static int PLAYERS_TO_START_GAME = 2;
+	private int playersToStartGame = 2;
 	private @Getter boolean serverRunning = false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
 	private @Getter int validUsers=0;
 	private Pictionary game = null;
 	private ServerSocket serverSocket=null;
 
+	public PictionaryServer(int playersToStartGame) {
+		this.playersToStartGame = playersToStartGame;
+		new Thread(this).start();
+	}
+	
 	public PictionaryServer() {
 		new Thread(this).start();
 	}
@@ -40,7 +45,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 	
 	private void listetningLoop() throws IOException {
-		while (users.size() < PLAYERS_TO_START_GAME) {
+		while (users.size() < playersToStartGame) {
 			Socket clientSocket = serverSocket.accept();
 			if (clientSocket != null) {
 				System.out.println("Connection accepted");
@@ -64,12 +69,12 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 			listetningLoop();
 
 			while (serverRunning) { // to keep thread alive and server socket open
-				if(users.size()<PLAYERS_TO_START_GAME) listetningLoop();
+				if(users.size()<playersToStartGame) listetningLoop();
 			}
 
 		} catch (IOException ioException) {
 			System.out.println("Issues with listening thread");
-			return;
+			throw new IllegalArgumentException("Probably another server is listening on this port.");
 		}
 
 	}
@@ -77,7 +82,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	public void addUserToGame(String name) {
 		game.addUser(name);
 		validUsers++;
-		if(validUsers==PLAYERS_TO_START_GAME) {
+		if(validUsers==playersToStartGame) {
 			startGame();
 		}
 	}

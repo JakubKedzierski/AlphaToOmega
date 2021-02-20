@@ -20,20 +20,20 @@ public class ClientServerCommunicationTest {
 
 	@Before
 	public void setUp() {
-		server = new PictionaryServer();
+		server = new PictionaryServer(4);
 	}
 
 	@Test
 	public void usersListShouldBeEmpty() {
 		try {
 			Thread.sleep(600);
-			PictionaryClient client1 = new PictionaryClient("test1",true);
+			PictionaryClient client1 = new PictionaryClient("test1", true);
 			Thread.sleep(300);
-			PictionaryClient client2 = new PictionaryClient("test2",true);
+			PictionaryClient client2 = new PictionaryClient("test2", true);
 			Thread.sleep(300);
-			PictionaryClient client3 = new PictionaryClient("test3",true);
+			PictionaryClient client3 = new PictionaryClient("test3", true);
 			Thread.sleep(300);
-			PictionaryClient client4 = new PictionaryClient("test4",true);
+			PictionaryClient client4 = new PictionaryClient("test4", true);
 			Thread.sleep(300);
 			assertEquals(4, server.getUsers().size());
 			Thread.sleep(1000);
@@ -42,34 +42,19 @@ public class ClientServerCommunicationTest {
 			client3.disconnect();
 			client4.disconnect();
 			Thread.sleep(300);
-			
+
 			assertEquals(0, server.getUsers().size());
 			assertEquals(0, server.getUsersIdList().size());
-			
-			/*PictionaryClient client5 =new PictionaryClient("test5");
-			Thread.sleep(200);
-			client5.disconnect();
-			Thread.sleep(300);
-			
-			assertEquals(0, server.getUsers().size());
-			assertEquals(0, server.getUsersIdList().size());*/
 
-		} catch (InterruptedException e) {
+
+		} catch (InterruptedException | IllegalArgumentException e) {
+			server.disconnectServer();
 			fail();
-			e.printStackTrace();
-		} 
-
-	}
-	
-
-	@After
-	public void cleanUp() {
-		server.disconnectServer();
-		try {
-			Thread.sleep(400);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return;
 		}
+		
+		server.disconnectServer();
+
 	}
+
 }

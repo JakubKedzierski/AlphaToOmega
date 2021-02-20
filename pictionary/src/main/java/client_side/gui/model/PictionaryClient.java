@@ -47,24 +47,6 @@ public class PictionaryClient implements Runnable {
 		clientType = false;
 	}
 
-	public PictionaryClient(GameInterfaceController guiController) {
-		this.guiController = guiController;
-		clientType = false;
-	}
-
-	public PictionaryClient(String name, GameInterfaceController guiController) {
-		this.guiController = guiController;
-		if (name != null)
-			this.username = name;
-		clientType = false;
-		try {
-			startClientConnection();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public PictionaryClient(String name, boolean testClient) {
 		clientType = testClient;
 		if (clientType == false)
