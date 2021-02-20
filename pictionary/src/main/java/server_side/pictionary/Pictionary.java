@@ -27,12 +27,13 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	public Pictionary(GameCommunication server, String[] wordDatabase) {
-		this(server);
+		this(server,2);
 		this.wordDatabase = wordDatabase;
 	}
 
-	public Pictionary(GameCommunication server) {
+	public Pictionary(GameCommunication server,int numberOfPlayers) {
 		this.server = server;
+		this.NUMBER_OF_PLAYERS=numberOfPlayers;
 		this.users = new ArrayList<PictionaryPlayer>();
 		roundCount = 0;
 	}

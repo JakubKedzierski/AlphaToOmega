@@ -9,7 +9,7 @@ public class PictionaryTestClass extends Pictionary {
 	private @Getter boolean roundEnded=false;
 	
 	public PictionaryTestClass(GameCommunication server) {
-		super(server);
+		super(server,4);
 		// TODO Auto-generated constructor stub
 	}
 	

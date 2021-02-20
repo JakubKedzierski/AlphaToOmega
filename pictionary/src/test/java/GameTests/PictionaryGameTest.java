@@ -28,7 +28,7 @@ public class PictionaryGameTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void checkIllegalUserCountInGame() {
-		game = new Pictionary(server);
+		game = new Pictionary(server,4);
 		game.addUser("test");
 		game.startGame();
 	}

@@ -24,17 +24,17 @@ import server_side.pictionary.Pictionary;
 public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
 	public static int SERVER_PORT = 25000;
 	private int playersToStartGame = 2;
-	private @Getter boolean serverRunning = false;
+	private @Getter boolean disconnected = false;
 	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
-	private @Getter int validUsers=0;
+	private @Getter int validUsers = 0;
 	private Pictionary game = null;
-	private ServerSocket serverSocket=null;
+	private ServerSocket serverSocket = null;
 
 	public PictionaryServer(int playersToStartGame) {
 		this.playersToStartGame = playersToStartGame;
 		new Thread(this).start();
 	}
-	
+
 	public PictionaryServer() {
 		new Thread(this).start();
 	}
@@ -43,7 +43,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		new PictionaryServer();
 
 	}
-	
+
 	private void listetningLoop() throws IOException {
 		while (users.size() < playersToStartGame) {
 			Socket clientSocket = serverSocket.accept();
@@ -57,23 +57,25 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	public void run() {
 		try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
-			this.serverSocket=serverSocket;
-			serverRunning = true;
+			this.serverSocket = serverSocket;
 			int port = serverSocket.getLocalPort();
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
 			System.out.println("Host address: " + address);
-			
-			game = new Pictionary(this);
+
+			game = new Pictionary(this, playersToStartGame);
 
 			listetningLoop();
 
-			while (serverRunning) { // to keep thread alive and server socket open
-				if(users.size()<playersToStartGame) listetningLoop();
+			while (!disconnected) { // to keep thread alive and server socket open
+				if (users.size() < playersToStartGame)
+					listetningLoop();
 			}
 
 		} catch (IOException ioException) {
-			System.out.println("Issues with listening thread");
+			if (disconnected)
+				return;
+
 			throw new IllegalArgumentException("Probably another server is listening on this port.");
 		}
 
@@ -82,25 +84,37 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	public void addUserToGame(String name) {
 		game.addUser(name);
 		validUsers++;
-		if(validUsers==playersToStartGame) {
+		if (validUsers == playersToStartGame) {
 			startGame();
 		}
 	}
 
 	public void startGame() {
 		try {
-			Thread.sleep(3000); 
-			String jsonMessage = PictionaryProtocolParser.createProtocolMessage("server", "broadcast", "gameInfo","StartGame");
+			Thread.sleep(3000);
+			String jsonMessage = PictionaryProtocolParser.createProtocolMessage("server", "broadcast", "gameInfo",
+					"StartGame");
 			sendBroadcastMessage("server", jsonMessage);
 			game.startGame();
-		} catch (IOException | PictionaryException | InterruptedException  e) {
+		} catch (IOException | PictionaryException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 	}
 
 	public void disconnectServer() {
-		serverRunning = false;
+		disconnected = true;
+		try {
+
+			for (ClientHandler handler : users) {
+				handler.diconnectClient();
+			}
+			
+			serverSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public ClientHandler getClientHandlerById(final String id) {
@@ -144,8 +158,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		return nameList;
 	}
 
-	public void sendGameInfo(String userId,String gameInfo) throws PictionaryException, IOException
-	{
+	public void sendGameInfo(String userId, String gameInfo) throws PictionaryException, IOException {
 		ClientHandler handler = getClientHandlerById(userId);
 		handler.sendMessageFromServerToClient("gameInfo", gameInfo);
 	}
@@ -164,7 +177,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	@Override
-	public void checkWord(String word,String username) {
+	public void checkWord(String word, String username) {
 		game.checkWord(word, username);
 	}
 
@@ -288,8 +301,8 @@ class ClientHandler implements Runnable {
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
 		String sender = messageInfo.get(PictionaryProtocolPool.SENDER);
 		String receiver = messageInfo.get(PictionaryProtocolPool.RECEIVER);
-		String message =  messageInfo.get(PictionaryProtocolPool.MESSAGE);
-		
+		String message = messageInfo.get(PictionaryProtocolPool.MESSAGE);
+
 		if (sender.equals(username)) {
 			if (receiver.equals("broadcast")) {
 				server.sendBroadcastMessage(sender, plainMessage);
@@ -300,9 +313,9 @@ class ClientHandler implements Runnable {
 					if (message.equals("disconected")) {
 						diconnectClient();
 					}
-					
+
 				} else if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("guessedWord")) {
-					server.checkWord(message,username);
+					server.checkWord(message, username);
 				}
 			} else {
 				server.sendMessageToClient(receiver, plainMessage);

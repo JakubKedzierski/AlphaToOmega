@@ -61,6 +61,8 @@ public class PictionaryClient implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		validateName(name);
 	}
 
 	public void startClientConnection() throws IOException {
@@ -215,6 +217,8 @@ public class PictionaryClient implements Runnable {
 		try {
 			if (inputStream != null)
 				sendMessage("Error", "disconected", "server");
+			
+			Thread.sleep(200);
 			if (socket != null)
 				socket.close();
 			if (inputStream != null)
@@ -222,8 +226,8 @@ public class PictionaryClient implements Runnable {
 			if (outputStream != null)
 				outputStream.close();
 			connected = false;
-		} catch (IOException | PictionaryException e) {
-
+		} catch (IOException | PictionaryException | InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
