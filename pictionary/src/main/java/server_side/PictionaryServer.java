@@ -59,9 +59,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		}
 	}
 
+	@Override
 	public void run() {
-		try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
-			this.serverSocket = serverSocket;
+		try  {
+			this.serverSocket = new ServerSocket(SERVER_PORT);
 			int port = serverSocket.getLocalPort();
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
@@ -72,12 +73,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 			listetningLoop();
 
-			while (!disconnected) { // to keep thread alive and server socket open
-			}
-
 		} catch (IOException ioException) {
-			if (disconnected)
-				return;
+			
+			if (disconnected) return;
+			else disconnectServer();
 
 			throw new IllegalArgumentException("Probably another server is listening on this port.");
 		}
@@ -148,8 +147,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	public void removeHandler(ClientHandler clientHandler) {
+		if(game.isGameRunning()) game.cleanUpAndUnexpectedEndGame();
 		users.remove(clientHandler);
 		validUsers--;
+		
+		if(validUsers==0) System.exit(0);
 	}
 
 	public ArrayList<String> getUsersIdList() {

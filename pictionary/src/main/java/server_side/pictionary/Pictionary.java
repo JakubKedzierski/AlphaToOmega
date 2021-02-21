@@ -27,13 +27,13 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	public Pictionary(GameCommunication server, String[] wordDatabase) {
-		this(server,2);
+		this(server, 2);
 		this.wordDatabase = wordDatabase;
 	}
 
-	public Pictionary(GameCommunication server,int numberOfPlayers) {
+	public Pictionary(GameCommunication server, int numberOfPlayers) {
 		this.server = server;
-		this.NUMBER_OF_PLAYERS=numberOfPlayers;
+		this.NUMBER_OF_PLAYERS = numberOfPlayers;
 		this.users = new ArrayList<PictionaryPlayer>();
 		roundCount = 0;
 	}
@@ -54,7 +54,7 @@ public class Pictionary implements PictionaryInterface {
 			}
 		}
 	}
-	
+
 	public PictionaryPlayer getWinner() {
 		PictionaryPlayer winner = Collections.max(users);
 		return winner;
@@ -81,25 +81,19 @@ public class Pictionary implements PictionaryInterface {
 
 			if (i == roundCount) {
 				player.setTypeOfPlayer("host");
-				try {
-					server.sendGameInfo(player.getName(), "host");
-					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
-					server.sendGameInfo(player.getName(), "word:" + wordDatabase[roundCount]);
-					server.sendGameInfo(player.getName(), "points:"+player.getPoints());
-				} catch (PictionaryException | IOException cirticalException) {
-					cleanUpAndUnexpectedEndGame();
-				}
-			}
 
-			else {
+				sendGameStatusInfo(player.getName(), "host");
+				sendGameStatusInfo(player.getName(), "round:" + (roundCount + 1));
+				sendGameStatusInfo(player.getName(), "word:" + wordDatabase[roundCount]);
+				sendGameStatusInfo(player.getName(), "points:" + player.getPoints());
+
+			} else {
+
 				player.setTypeOfPlayer("listener");
-				try {
-					server.sendGameInfo(player.getName(), "listener");
-					server.sendGameInfo(player.getName(), "round:"+ (roundCount+1));
-					server.sendGameInfo(player.getName(), "points:"+player.getPoints());
-				} catch (PictionaryException | IOException cirticalException) {
-					cleanUpAndUnexpectedEndGame();
-				}
+				sendGameStatusInfo(player.getName(), "listener");
+				sendGameStatusInfo(player.getName(), "round:" + (roundCount + 1));
+				sendGameStatusInfo(player.getName(), "points:" + player.getPoints());
+
 			}
 		}
 
@@ -118,13 +112,10 @@ public class Pictionary implements PictionaryInterface {
 		if (round.guessedWord(word)) {
 			player.addPoints(2);
 			player.setGoodGuessAlreadyDone(true);
-			try {
-				server.sendGameInfo(player.getName(), "goodGuess");
-				server.sendGameInfo(player.getName(), "points:"+player.getPoints());
-			} catch (PictionaryException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
+			sendGameStatusInfo(player.getName(), "goodGuess");
+			sendGameStatusInfo(player.getName(), "points:" + player.getPoints());
+
 			return true;
 		}
 		return false;
@@ -136,29 +127,19 @@ public class Pictionary implements PictionaryInterface {
 
 		for (PictionaryPlayer player : users) {
 			player.setGoodGuessAlreadyDone(false);
-			try {
-				server.sendGameInfo(player.getName(), "round ended");
-			} catch (PictionaryException | IOException  e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			sendGameStatusInfo(player.getName(), "round ended");
 		}
-		
 
 		if (roundCount < NUMBER_OF_ROUNDS) {
 			gameLoop();
-		} else {
-			
-			gameRunning = false;
-			try {
-				PictionaryPlayer winner= getWinner();
-				for (PictionaryPlayer player : users) {
-					server.sendGameInfo(player.getName(), "game ended | winner:" + winner.getName());
-				}
-			} catch (PictionaryException | IOException cirticalException) {
-				cleanUpAndUnexpectedEndGame();
-			}
 
+		} else {
+			PictionaryPlayer winner = getWinner();
+
+			for (PictionaryPlayer player : users) {
+				sendGameStatusInfo(player.getName(), "game ended | winner:" + winner.getName());
+			}
+			gameRunning = false;
 		}
 	}
 
@@ -184,6 +165,16 @@ public class Pictionary implements PictionaryInterface {
 			}
 		}
 		return null;
+	}
+
+	private void sendGameStatusInfo(String username, String message) {
+		if(!gameRunning) return;
+		
+		try {
+			server.sendGameInfo(username, message);
+		} catch (PictionaryException | IOException e) {
+			cleanUpAndUnexpectedEndGame();
+		}
 	}
 
 }
