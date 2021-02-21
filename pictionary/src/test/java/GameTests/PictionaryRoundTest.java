@@ -5,12 +5,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import pictionaryMockClasses.GameCommunicationTestServer;
-import pictionaryMockClasses.PictionaryTestClass;
-import server_side.pictionary.Pictionary;
+import pictionarySimplifiedClassesForTests.GameCommunicationTestServer;
+import pictionarySimplifiedClassesForTests.PictionaryTestClass;
 import server_side.pictionary.PictionaryRound;
 
 @RunWith(MockitoJUnitRunner.class)

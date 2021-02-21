@@ -3,7 +3,9 @@ package client_side.gui.model;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ public class PictionaryClient implements Runnable {
 
 	public static String SERVER_NAME = "localhost";
 	public static int SERVER_PORT = 25000;
+	public static int CONNECTION_TIMEOUT=2000;
 
 	private @Getter String username;
 	private @Getter Socket socket = null;
@@ -46,27 +49,24 @@ public class PictionaryClient implements Runnable {
 		this.app = app;
 		clientType = false;
 	}
+	
+	public PictionaryClient() {}
 
-	public PictionaryClient(String name, boolean testClient) {
-		clientType = testClient;
-		if (clientType == false)
-			throw new IllegalArgumentException("Start client gui first");
-
+	public PictionaryClient(String name) throws IOException {
+		clientType = true;
+		
 		if (name != null)
 			this.username = name;
 
-		try {
-			startClientConnection();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		startClientConnection();
 		validateName(name);
 	}
 
 	public void startClientConnection() throws IOException {
-		socket = new Socket(SERVER_NAME, SERVER_PORT);
+		socket = new Socket();
+		SocketAddress addres = new InetSocketAddress(SERVER_NAME, SERVER_PORT);
+		socket.connect(addres,CONNECTION_TIMEOUT);
+		
 		inputStream = new ObjectInputStream(socket.getInputStream());
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
 		connected = true;
@@ -183,9 +183,14 @@ public class PictionaryClient implements Runnable {
 			break;
 
 		case "pixelVector":
+			if(message.equals("clear")) {
+				guiController.cleanBoard(); return;
+			}
 			String x =message.substring(0, message.indexOf(":"));
-			String y = message.substring(message.indexOf(":") + 1);
-			guiController.drawImageFromHost(Double.parseDouble(x),Double.parseDouble(y));
+			String y = message.substring(message.indexOf(":") + 1,message.indexOf("|"));
+			String size = message.substring(message.indexOf("|") + 1,message.indexOf("["));
+			String color =  message.substring(message.indexOf("[") + 1);
+			guiController.drawImageFromHost(Double.parseDouble(x),Double.parseDouble(y),Double.parseDouble(size),color);
 			break;
 
 		case "Error":

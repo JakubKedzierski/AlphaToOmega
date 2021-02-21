@@ -14,7 +14,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -28,6 +30,8 @@ import server_side.PictionaryException;
 
 public class GameInterfaceController {
 
+	private final int maxBrushSize = 18;
+	private final int minBrushSize = 3;
 	private PictionaryClient client;
 
 	@FXML
@@ -38,6 +42,8 @@ public class GameInterfaceController {
 	private TextField guessWordField;
 	@FXML
 	private Button guessWordButton;
+	@FXML
+	private Button clearButton;
 	@FXML
 	private Label roundLabel;
 	@FXML
@@ -50,6 +56,14 @@ public class GameInterfaceController {
 	private Canvas drawingBoardCanvas;
 	@FXML
 	private Label userPointsLabel;
+	@FXML
+	private Label guessingWordInfoLabel;
+	@FXML
+	private Label guessingWordLabel;
+	@FXML
+	private Slider brushSizeSlider;
+	@FXML
+	private ColorPicker brushColorPicker;
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -75,6 +89,10 @@ public class GameInterfaceController {
 				});
 
 		userPointsLabel.setText(Integer.toString(0));
+		brushSizeSlider.setMax(maxBrushSize);
+		brushSizeSlider.setMin(minBrushSize);
+		brushSizeSlider.setValue(6);
+		brushColorPicker.setValue(Color.BLACK);
 	}
 
 	@FXML
@@ -102,6 +120,8 @@ public class GameInterfaceController {
 	@FXML
 	public void guessWord() {
 		if (guessWordField.getText() != null || guessWordField.getText().length() != 0) {
+			guessingWordLabel.setText(guessWordField.getText());
+
 			try {
 				client.sendMessage("guessedWord", guessWordField.getText(), "server");
 				guessWordField.setText("");
@@ -117,12 +137,26 @@ public class GameInterfaceController {
 		if (typeOfPlayerLabel.getText().equals("listener"))
 			return;
 
+		double size = brushSizeSlider.getValue();
 		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
-		gc.setFill(Color.BLACK);
-		gc.fillRect(mouse.getX(), mouse.getY(), 6, 6);
+		gc.setFill(brushColorPicker.getValue());
+
+		gc.fillRect(mouse.getX(), mouse.getY(), size, size);
 
 		try {
-			client.sendMessage("pixelVector", mouse.getX() + ":" + mouse.getY(), "broadcast");
+			client.sendMessage("pixelVector",
+					mouse.getX() + ":" + mouse.getY() + "|" + size + "[" + brushColorPicker.getValue(), "broadcast");
+		} catch (PictionaryException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@FXML
+	public void clearEachBoard() {
+		cleanBoard();
+		try {
+			client.sendMessage("pixelVector", "clear", "broadcast");
 		} catch (PictionaryException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -143,17 +177,19 @@ public class GameInterfaceController {
 		});
 	}
 
-	public void drawImageFromHost(double x, double y) {
+	public void drawImageFromHost(double x, double y, double size, String color) {
 		if (typeOfPlayerLabel.getText().equals("host"))
 			return;
 
 		GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
-		gc.setFill(Color.BLACK);
-		gc.fillRect(x, y, 6, 6);
+		gc.setFill(Color.web(color));
+		gc.fillRect(x, y, size, size);
 	}
 
 	public void showWordToGuess(String word) {
+
 		Platform.runLater(() -> {
+			guessingWordLabel.setText(word);
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Host info");
 			alert.setHeaderText("You are host! Your word to show is: " + word);
@@ -187,8 +223,10 @@ public class GameInterfaceController {
 			guessWordField.setVisible(false);
 			guessWordButton.setDisable(true);
 			guessWordButton.setVisible(false);
-
+			guessingWordInfoLabel.setText("Your word to present is:");
+			guessingWordLabel.setText("");
 			typeOfPlayerLabel.setText("host");
+			clearButton.setVisible(true);
 		});
 	}
 
@@ -198,7 +236,10 @@ public class GameInterfaceController {
 			guessWordField.setVisible(true);
 			guessWordButton.setDisable(false);
 			guessWordButton.setVisible(true);
+			guessingWordInfoLabel.setText("Your last guess was:");
+			guessingWordLabel.setText("");
 			typeOfPlayerLabel.setText("listener");
+			clearButton.setVisible(false);
 		});
 	}
 

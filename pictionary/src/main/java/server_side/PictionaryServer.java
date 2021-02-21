@@ -29,9 +29,12 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	private @Getter int validUsers = 0;
 	private Pictionary game = null;
 	private ServerSocket serverSocket = null;
+	private int acceptedConnections=0;
+	private @Getter boolean testMode=false;
 
-	public PictionaryServer(int playersToStartGame) {
+	public PictionaryServer(int playersToStartGame,boolean testMode) {
 		this.playersToStartGame = playersToStartGame;
+		this.testMode=testMode;
 		new Thread(this).start();
 	}
 
@@ -45,8 +48,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	private void listetningLoop() throws IOException {
-		while (users.size() < playersToStartGame) {
+		while (acceptedConnections < playersToStartGame) {
 			Socket clientSocket = serverSocket.accept();
+			acceptedConnections++;
 			if (clientSocket != null) {
 				System.out.println("Connection accepted");
 				ClientHandler userHandler = new ClientHandler(this, clientSocket);
@@ -62,14 +66,13 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
 			System.out.println("Host address: " + address);
-
+			
+			if(!testMode)
 			game = new Pictionary(this, playersToStartGame);
 
 			listetningLoop();
 
 			while (!disconnected) { // to keep thread alive and server socket open
-				if (users.size() < playersToStartGame)
-					listetningLoop();
 			}
 
 		} catch (IOException ioException) {
@@ -254,7 +257,7 @@ class ClientHandler implements Runnable {
 	private void newConnectionStartup(String message) throws PictionaryException, IOException {
 
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(message);
-		System.out.println(message);
+
 		if (messageInfo.get(PictionaryProtocolPool.MESSAGETYPE).equals("NameValidation")) {
 
 			String userDeclaredName = messageInfo.get(PictionaryProtocolPool.MESSAGE);
@@ -274,7 +277,7 @@ class ClientHandler implements Runnable {
 			} else {
 				username = userDeclaredName;
 				sendMessageFromServerToClient("NameValidation", "OK");
-				server.addUserToGame(userDeclaredName);
+				if(!server.isTestMode())  server.addUserToGame(userDeclaredName);
 			}
 		} else {
 			throw new PictionaryException("Message dosent contain name attribute.");

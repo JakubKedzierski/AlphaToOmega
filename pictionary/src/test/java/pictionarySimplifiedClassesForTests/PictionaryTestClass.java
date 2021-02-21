@@ -1,4 +1,4 @@
-package pictionaryMockClasses;
+package pictionarySimplifiedClassesForTests;
 
 import lombok.Getter;
 import server_side.GameCommunication;
@@ -10,7 +10,6 @@ public class PictionaryTestClass extends Pictionary {
 	
 	public PictionaryTestClass(GameCommunication server) {
 		super(server,4);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
