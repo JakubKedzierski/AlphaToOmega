@@ -79,7 +79,7 @@ public class Pictionary implements PictionaryInterface {
 		for (int i = 0; i < users.size(); i++) {
 			PictionaryPlayer player = users.get(i);
 
-			if (i == roundCount) {
+			if ( (i%NUMBER_OF_PLAYERS ) == roundCount) {
 				player.setTypeOfPlayer("host");
 
 				sendGameStatusInfo(player.getName(), "host");
