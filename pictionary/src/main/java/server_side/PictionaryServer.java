@@ -112,7 +112,8 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 				handler.diconnectClient();
 			}
 			
-			serverSocket.close();
+			if(serverSocket!=null && !serverSocket.isClosed()) serverSocket.close();
+		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,7 +148,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	public void removeHandler(ClientHandler clientHandler) {
-		if(game.isGameRunning()) game.cleanUpAndUnexpectedEndGame();
+		if(game!=null && game.isGameRunning()) game.cleanUpAndUnexpectedEndGame();
 		users.remove(clientHandler);
 		validUsers--;
 		
