@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +98,7 @@ public class PictionaryClient implements Runnable {
 				}
 			}
 
-		} catch (JacksonException | ClassNotFoundException e) {
+		} catch ( ClassNotFoundException e) {
 			System.out.println("Wrong data type during comunication");
 
 		} catch (IOException e) {
@@ -122,7 +121,7 @@ public class PictionaryClient implements Runnable {
 
 	}
 
-	public void parseProtocolMessage(String plainMessage) throws JacksonException, PictionaryException {
+	public void parseProtocolMessage(String plainMessage) throws JsonProcessingException, PictionaryException {
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
 		String messageType = messageInfo.get(PictionaryProtocolPool.MESSAGETYPE);
 		String message = messageInfo.get(PictionaryProtocolPool.MESSAGE);

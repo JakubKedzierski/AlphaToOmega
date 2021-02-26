@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,14 +30,14 @@ public class pictionaryProcolParserTest {
 		try {
 			checkedMessage = mapper.writeValueAsString(node);
 			PictionaryProtocolParser.parseProtocol(checkedMessage);
-		} catch (JacksonException e) {
+		} catch (JsonProcessingException e) {
 			fail();
 		}
 
 	}
 
-	@Test(expected = JacksonException.class)
-	public void shouldSayProtocolMessageCanNotBeParsedByJackson() throws JacksonException {
+	@Test(expected = JsonProcessingException.class)
+	public void shouldSayProtocolMessageCanNotBeParsedByJackson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode node = mapper.createObjectNode();
 		((ObjectNode) node).put("sender", "test");
@@ -70,9 +69,7 @@ public class pictionaryProcolParserTest {
 			assertEquals("Error", map.get(PictionaryProtocolPool.MESSAGETYPE));
 		} catch (JsonProcessingException | PictionaryException e) {
 			fail();
-		} catch (JacksonException e) {
-			fail();
-		}
+		} 
 	}
 
 }

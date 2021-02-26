@@ -3,9 +3,9 @@ package protocol_parser;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,7 +17,7 @@ public final class PictionaryProtocolParser {
 	private static final String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation",
 			"gameInfo" };
 
-	public static HashMap<PictionaryProtocolPool, String> parseProtocol(String jsonMessage) throws JacksonException {
+	public static HashMap<PictionaryProtocolPool, String> parseProtocol(String jsonMessage) throws JsonProcessingException  {
 		HashMap<PictionaryProtocolPool, String> parsedMessage = new HashMap<PictionaryProtocolPool, String>();
 
 		ObjectMapper mapper = new ObjectMapper();

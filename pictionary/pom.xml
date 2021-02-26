@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId> com.github.jakubkedzierski </groupId>
   <artifactId>pictionary</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
   <name>Pictionary</name>
   <description>Pictionary for 4 players</description>
      
@@ -12,11 +12,64 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   
+  
+  	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>PictionaryClient</id>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifest>
+									<mainClass>client_side.PictionaryClientApp</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>${project.artifactId}Client</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>PictionaryServer</id>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifest>
+									<mainClass>server_side.PictionaryServer</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>${project.artifactId}Server</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+  
+  
+  
   <dependencies>
   	<dependency>
   		<groupId>com.fasterxml.jackson.core</groupId>
   		<artifactId>jackson-databind</artifactId>
-  		<version>2.12.1</version>
+  		<version>2.11.4</version>
   	</dependency>
   	<dependency>
   		<groupId>junit</groupId>
