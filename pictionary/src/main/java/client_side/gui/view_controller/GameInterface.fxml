@@ -34,20 +34,20 @@
                <children>
                   <Pane layoutX="18.0" layoutY="24.0" styleClass="canvasBoard">
                      <children>
-                        <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="643.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" width="863.0" />
+                        <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="680.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" width="865.0" />
                      </children>
                   </Pane>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" GridPane.rowIndex="1">
                <children>
-                  <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="24.0" prefHeight="119.0" prefWidth="856.0" />
-                  <TextField fx:id="messageTypedInField" layoutX="21.0" layoutY="143.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="769.0" />
-                  <Button layoutX="790.0" layoutY="143.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" styleClass="buttons" text="send">
+                  <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="192.0" layoutY="24.0" prefHeight="119.0" prefWidth="534.0" />
+                  <TextField fx:id="messageTypedInField" layoutX="192.0" layoutY="143.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="447.0" />
+                  <Button layoutX="639.0" layoutY="143.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" styleClass="buttons" text="send">
                      <font>
                         <Font size="15.0" />
                      </font></Button>
-                  <Label layoutX="21.0" layoutY="-6.0" styleClass="labelsText" text="Group chat:">
+                  <Label layoutX="144.0" layoutY="69.0" styleClass="labelsText" text="chat">
                      <font>
                         <Font size="20.0" />
                      </font>

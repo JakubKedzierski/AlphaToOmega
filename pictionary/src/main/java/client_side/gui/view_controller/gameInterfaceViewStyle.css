@@ -27,4 +27,6 @@
 .labelsText{
 	-fx-text-fill:  #000000;
 	-fx-font-size: 20;
+	-fx-font-weight: 400;	
+	-fx-font-family: fantasy;
 }
