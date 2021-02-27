@@ -1,7 +1,6 @@
-package client_side.gui.model;
+package client_side;
 
 public interface ClientApp {
 	
 	public void startGame();
-	public void endGame();
 }

@@ -1,6 +1,5 @@
 package client_side;
 
-import client_side.gui.model.ClientApp;
 import client_side.gui.model.PictionaryClient;
 import client_side.gui.view_controller.ClientStartUpDialogController;
 import client_side.gui.view_controller.GameInterfaceController;
@@ -32,7 +31,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		try {
 
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(PictionaryClientApp.class.getResource("gui/view_controller/RootLayout.fxml"));
+			loader.setLocation(getClass().getResource("gui/view_controller/RootLayout.fxml"));
 			rootLayout = (BorderPane) loader.load();
 
 			Scene scene = new Scene(rootLayout);
@@ -46,7 +45,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 	public void showPreviewDialog() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(PictionaryClientApp.class.getResource("gui/view_controller/ClientStartUpDialog.fxml"));
+			loader.setLocation(getClass().getResource("gui/view_controller/ClientStartUpDialog.fxml"));
 			AnchorPane clientStartUpDialog = (AnchorPane) loader.load();
 			rootLayout.setCenter(clientStartUpDialog);
 
@@ -60,7 +59,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 	public void waitForOtherPlayers() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(PictionaryClientApp.class.getResource("gui/view_controller/WaitingStage.fxml"));
+			loader.setLocation(getClass().getResource("gui/view_controller/WaitingStage.fxml"));
 			AnchorPane clientStartUpDialog = (AnchorPane) loader.load();
 			rootLayout.setCenter(null);
 			rootLayout.setCenter(clientStartUpDialog);
@@ -77,7 +76,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 
-			loader.setLocation(PictionaryClientApp.class.getResource("gui/view_controller/GameInterface.fxml"));
+			loader.setLocation(getClass().getResource("gui/view_controller/GameInterface.fxml"));
 			AnchorPane gameInterface = (AnchorPane) loader.load();
 
 			GameInterfaceController controller = loader.getController();
@@ -90,17 +89,11 @@ public class PictionaryClientApp extends Application implements ClientApp {
 				});
 			
 
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Override
-	public void endGame() {
-
-		
-	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -109,7 +102,7 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		this.primaryStage.setResizable(false);
 		
 		try {
-			Image gameIcon= new Image(ClassLoader.getSystemResourceAsStream("images/game_icon.png"));
+			Image gameIcon= new Image(ClassLoader.getSystemResourceAsStream("client_side/gui/images/game_icon.png"));
 			primaryStage.getIcons().add(gameIcon);
 		}catch(Exception e) {
 			System.out.println("Trobules with loading game icon");

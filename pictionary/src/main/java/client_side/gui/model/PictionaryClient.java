@@ -9,6 +9,8 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import client_side.ClientApp;
 import client_side.gui.view_controller.GameInterfaceController;
 import lombok.Getter;
 import lombok.Setter;
