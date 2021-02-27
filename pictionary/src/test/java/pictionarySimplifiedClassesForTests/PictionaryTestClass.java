@@ -16,6 +16,11 @@ public class PictionaryTestClass extends Pictionary {
 	public void roundEnded() {
 		roundEnded=true;
 	}
+	
+	@Override
+	public void sendPeriodicTimeInfo(int whichPeriod, int numberOfPeriods) {
+		System.out.println("periodic info sended \n" + "period:" + whichPeriod + "/" + numberOfPeriods);
+	}
 
 	
 }

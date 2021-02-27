@@ -79,7 +79,7 @@ public class Pictionary implements PictionaryInterface {
 		for (int i = 0; i < users.size(); i++) {
 			PictionaryPlayer player = users.get(i);
 
-			if ( (i%NUMBER_OF_PLAYERS ) == roundCount) {
+			if ((i % NUMBER_OF_PLAYERS) == roundCount) {
 				player.setTypeOfPlayer("host");
 
 				sendGameStatusInfo(player.getName(), "host");
@@ -168,12 +168,20 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	private void sendGameStatusInfo(String username, String message) {
-		if(!gameRunning) return;
-		
+		if (!gameRunning)
+			return;
+
 		try {
 			server.sendGameInfo(username, message);
 		} catch (PictionaryException | IOException e) {
 			cleanUpAndUnexpectedEndGame();
+		}
+	}
+
+	@Override
+	public void sendPeriodicTimeInfo(int whichPeriod, int numberOfPeriods) {
+		for (PictionaryPlayer player : users) {
+			sendGameStatusInfo(player.getName(), "period:" + whichPeriod + "/" + numberOfPeriods);
 		}
 	}
 

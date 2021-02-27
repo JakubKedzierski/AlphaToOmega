@@ -126,7 +126,6 @@ public class PictionaryClient implements Runnable {
 		String messageType = messageInfo.get(PictionaryProtocolPool.MESSAGETYPE);
 		String message = messageInfo.get(PictionaryProtocolPool.MESSAGE);
 		
-		// System.out.println(username +"| " + plainMessage);
 
 		switch (messageType) {
 
@@ -172,6 +171,12 @@ public class PictionaryClient implements Runnable {
 			
 			if(message.startsWith("points:")) {
 				guiController.setPoints(Integer.parseInt(message.substring(7)));
+			}
+			
+			if(message.startsWith("period:")) {
+				int period = Integer.parseInt(message.substring(7,message.indexOf("/")));
+				int numberOfPeriods = Integer.parseInt(message.substring(message.indexOf("/")+1));
+				guiController.setProgressBarValue(period, numberOfPeriods);
 			}
 			
 			if(message.equals("round ended")) {

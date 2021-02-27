@@ -1,6 +1,9 @@
 package client_side.gui.view_controller;
 
 import java.io.IOException;
+
+import javax.swing.plaf.synth.SynthOptionPaneUI;
+
 import client_side.gui.model.PictionaryClient;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -16,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
@@ -49,8 +53,6 @@ public class GameInterfaceController {
 	@FXML
 	private Label typeOfPlayerLabel;
 	@FXML
-	private Label timeLeftLabel;
-	@FXML
 	private Label usernameLabel;
 	@FXML
 	private Canvas drawingBoardCanvas;
@@ -64,6 +66,8 @@ public class GameInterfaceController {
 	private Slider brushSizeSlider;
 	@FXML
 	private ColorPicker brushColorPicker;
+	@FXML
+	private ProgressBar progressBar;
 
 	public void setClient(PictionaryClient client) {
 		this.client = client;
@@ -161,6 +165,13 @@ public class GameInterfaceController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void setProgressBarValue(double value, double maxValue) {
+		Platform.runLater(() -> {
+			double progress=value/maxValue; 
+			progressBar.setProgress(progress);
+		});
 	}
 
 	public void cleanBoard() {
