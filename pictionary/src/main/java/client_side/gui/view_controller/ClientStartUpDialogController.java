@@ -1,14 +1,10 @@
 package client_side.gui.view_controller;
 
-import java.io.IOException;
 
 import client_side.PictionaryClientApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import lombok.Getter;
-import lombok.Setter;
-import server_side.PictionaryException;
 import javafx.scene.control.TextField;
 
 

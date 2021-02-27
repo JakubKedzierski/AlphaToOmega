@@ -6,27 +6,15 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 
-import javax.management.RuntimeErrorException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import client_side.PictionaryClientApp;
 import client_side.gui.view_controller.GameInterfaceController;
 import lombok.Getter;
 import lombok.Setter;
 import protocol_parser.PictionaryProtocolParser;
 import protocol_parser.PictionaryProtocolPool;
 import server_side.PictionaryException;
-import server_side.pictionary.PictionaryPlayer;
 
 public class PictionaryClient implements Runnable {
 
@@ -224,10 +212,10 @@ public class PictionaryClient implements Runnable {
 
 	public void disconnect() {
 		try {
-			if (inputStream != null)
+			if (inputStream != null && !socket.isClosed())
 				sendMessage("Error", "disconected", "server");
 			
-			Thread.sleep(200);
+			Thread.sleep(400);
 			if (socket != null)
 				socket.close();
 			if (inputStream != null)

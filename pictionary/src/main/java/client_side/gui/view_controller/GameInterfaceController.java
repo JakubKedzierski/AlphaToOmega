@@ -2,14 +2,11 @@ package client_side.gui.view_controller;
 
 import java.io.IOException;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-
 import client_side.gui.model.PictionaryClient;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleIntegerProperty;
+
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
+
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,15 +18,15 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
-import javafx.scene.control.SplitPane;
+
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
+
 import javafx.scene.paint.Color;
-import lombok.Setter;
+
 import server_side.PictionaryException;
 
 public class GameInterfaceController {
@@ -169,7 +166,7 @@ public class GameInterfaceController {
 
 	public void setProgressBarValue(double value, double maxValue) {
 		Platform.runLater(() -> {
-			double progress=value/maxValue; 
+			double progress = value / maxValue;
 			progressBar.setProgress(progress);
 		});
 	}

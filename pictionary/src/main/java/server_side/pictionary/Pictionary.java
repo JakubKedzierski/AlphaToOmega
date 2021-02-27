@@ -6,30 +6,22 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.Setter;
 import server_side.GameCommunication;
 import server_side.PictionaryException;
 
 public class Pictionary implements PictionaryInterface {
-	private int NUMBER_OF_PLAYERS = 2;
-	private int NUMBER_OF_ROUNDS = 2;
+	private @Setter int NUMBER_OF_PLAYERS = 2;
+	private @Setter int NUMBER_OF_ROUNDS = 2;
+	private @Setter int ROUND_TIME=60*1000;
 
-	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
+	private @Setter String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
 	private List<PictionaryPlayer> users;
 	private GameCommunication server;
 	private @Getter int roundCount;
 	private @Getter PictionaryRound round = null;
 	private @Getter boolean gameRunning = false;
 
-	public Pictionary(GameCommunication server, String[] wordDatabase, int numberOfRounds, int numberOfPlayers) {
-		this(server, wordDatabase);
-		this.NUMBER_OF_PLAYERS = numberOfPlayers;
-		this.NUMBER_OF_ROUNDS = numberOfRounds;
-	}
-
-	public Pictionary(GameCommunication server, String[] wordDatabase) {
-		this(server, 2);
-		this.wordDatabase = wordDatabase;
-	}
 
 	public Pictionary(GameCommunication server, int numberOfPlayers) {
 		this.server = server;
@@ -71,7 +63,7 @@ public class Pictionary implements PictionaryInterface {
 
 	private void gameLoop() {
 		chooseNewHost();
-		round = new PictionaryRound(wordDatabase[roundCount], this);
+		round = new PictionaryRound(ROUND_TIME,wordDatabase[roundCount], this);
 		roundCount++;
 	}
 

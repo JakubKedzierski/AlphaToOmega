@@ -35,8 +35,8 @@ public class PictionaryGameTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void addingTooMuchPlayers() {
-		String database[] = {"testWord"};
-		game = new Pictionary(server,database,1,2);
+		game = new Pictionary(server,2);
+		game.setNUMBER_OF_ROUNDS(1);
 		game.addUser("test1");
 		game.addUser("test2");
 		game.addUser("test3");
@@ -45,7 +45,12 @@ public class PictionaryGameTest {
 	@Test
 	public void checkGameDuration() {
 		String database[] = {"testWord"};
-		game = new Pictionary(server,database,1,2);
+		game = new Pictionary(server,2);
+		game.setNUMBER_OF_ROUNDS(1);
+		game.setROUND_TIME(1*1000);
+		game.setWordDatabase(database);
+		
+		
 		game.addUser("test1");game.addUser("test2");
 
 		game.startGame();

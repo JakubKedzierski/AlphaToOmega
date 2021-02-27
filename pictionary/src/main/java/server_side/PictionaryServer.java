@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -230,14 +227,11 @@ class ClientHandler implements Runnable {
 				}
 			}
 
-		} catch (IOException | ClassNotFoundException exception) {
+		} catch (IOException | ClassNotFoundException |PictionaryException exception) {
 			System.out.println("Client connecetion failed");
 			server.removeHandler(this);
 			return;
-		} catch (PictionaryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 
 	}
 

@@ -37,10 +37,6 @@ public class PictionaryRound{
 		timer = new Timer();
 		timer.scheduleAtFixedRate(task,0,roundTime/TIMERS_PERIODS_ON_ONE_ROUND);
 	}
-
-	public PictionaryRound(String wordToGuess,PictionaryInterface pictionary) {
-		this(60 * 1000, wordToGuess,pictionary);
-	}
 	
 
 	public void endRound() {
