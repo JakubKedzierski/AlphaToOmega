@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client_side.gui.view_controller.GameInterfaceController">
+<AnchorPane prefHeight="900.0" prefWidth="1200.0" styleClass="globalBackground" stylesheets="@gameInterfaceViewStyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client_side.gui.view_controller.GameInterfaceController">
    <children>
       <GridPane prefHeight="900.0" prefWidth="1198.0">
          <columnConstraints>
@@ -32,18 +32,22 @@
                   <Insets />
                </GridPane.margin>
                <children>
-                  <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="643.0" layoutX="18.0" layoutY="24.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" styleClass="drawingBoardCanvas" width="863.0" />
+                  <Pane layoutX="18.0" layoutY="24.0" styleClass="canvasBoard">
+                     <children>
+                        <Canvas fx:id="drawingBoardCanvas" focusTraversable="true" height="643.0" onMouseClicked="#drawRectangle" onMouseDragged="#drawRectangle" width="863.0" />
+                     </children>
+                  </Pane>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" GridPane.rowIndex="1">
                <children>
-                  <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="24.0" prefHeight="119.0" prefWidth="886.0" />
-                  <TextField fx:id="messageTypedInField" layoutX="21.0" layoutY="143.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="800.0" />
-                  <Button layoutX="821.0" layoutY="143.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" text="send">
+                  <TextArea fx:id="messageConsoleField" editable="false" focusTraversable="false" layoutX="21.0" layoutY="24.0" prefHeight="119.0" prefWidth="856.0" />
+                  <TextField fx:id="messageTypedInField" layoutX="21.0" layoutY="143.0" onKeyPressed="#sendMessageOnEnterPressed" prefHeight="39.0" prefWidth="769.0" />
+                  <Button layoutX="790.0" layoutY="143.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="39.0" prefWidth="87.0" styleClass="buttons" text="send">
                      <font>
                         <Font size="15.0" />
                      </font></Button>
-                  <Label layoutX="21.0" layoutY="-6.0" text="Group chat:">
+                  <Label layoutX="21.0" layoutY="-6.0" styleClass="labelsText" text="Group chat:">
                      <font>
                         <Font size="20.0" />
                      </font>
@@ -66,7 +70,7 @@
                               <Insets left="20.0" right="120.0" />
                            </GridPane.margin>
                         </TextField>
-                        <Button fx:id="guessWordButton" mnemonicParsing="false" onAction="#guessWord" prefHeight="34.0" prefWidth="115.0" text="guess word" GridPane.rowIndex="2">
+                        <Button fx:id="guessWordButton" mnemonicParsing="false" onAction="#guessWord" prefHeight="34.0" prefWidth="115.0" styleClass="buttons" text="guess word" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="170.0" />
                            </GridPane.margin>
@@ -76,32 +80,32 @@
                         </Button>
                         <Pane prefHeight="443.0" prefWidth="285.0">
                            <children>
-                              <Label layoutX="52.0" layoutY="69.0" text="Type of player: ">
+                              <Label layoutX="52.0" layoutY="69.0" styleClass="labelsText" text="Type of player: ">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="52.0" layoutY="112.0" text="Time left:">
+                              <Label layoutX="52.0" layoutY="112.0" styleClass="labelsText" text="Time left:">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="88.0" layoutY="16.0" text="Round:">
+                              <Label layoutX="88.0" layoutY="16.0" styleClass="labelsText" text="Round:">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="roundLabel" layoutX="162.0" layoutY="16.0" prefHeight="30.0" prefWidth="62.0" text="   ">
+                              <Label fx:id="roundLabel" layoutX="162.0" layoutY="16.0" prefHeight="30.0" prefWidth="62.0" styleClass="labelsText" text="   ">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="typeOfPlayerLabel" layoutX="193.0" layoutY="69.0" prefHeight="30.0" prefWidth="91.0">
+                              <Label fx:id="typeOfPlayerLabel" layoutX="193.0" layoutY="69.0" prefHeight="30.0" prefWidth="91.0" styleClass="labelsText">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="timeLeftLabel" layoutX="143.0" layoutY="112.0" prefHeight="30.0" prefWidth="81.0">
+                              <Label fx:id="timeLeftLabel" layoutX="143.0" layoutY="112.0" prefHeight="30.0" prefWidth="81.0" styleClass="labelsText">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -110,24 +114,24 @@
                         </Pane>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                            <children>
-                              <Label fx:id="guessingWordInfoLabel" alignment="CENTER" layoutX="30.0" layoutY="14.0" prefHeight="30.0" prefWidth="231.0" text="Your word to present is:">
+                              <Label fx:id="guessingWordInfoLabel" alignment="CENTER" layoutX="30.0" layoutY="14.0" prefHeight="30.0" prefWidth="231.0" styleClass="labelsText" text="Your word to present is:">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="guessingWordLabel" alignment="CENTER" layoutX="66.0" layoutY="55.0" prefHeight="30.0" prefWidth="145.0" textAlignment="CENTER">
+                              <Label fx:id="guessingWordLabel" alignment="CENTER" layoutX="66.0" layoutY="55.0" prefHeight="30.0" prefWidth="145.0" styleClass="labelsText" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
                               <Slider fx:id="brushSizeSlider" layoutX="69.0" layoutY="253.0" prefHeight="47.0" prefWidth="140.0" />
-                              <ColorPicker fx:id="brushColorPicker" layoutX="75.0" layoutY="313.0" prefHeight="40.0" prefWidth="135.0" />
-                              <Label alignment="CENTER" layoutX="67.0" layoutY="227.0" prefHeight="30.0" prefWidth="140.0" text="brush size:" textAlignment="CENTER">
+                              <ColorPicker fx:id="brushColorPicker" layoutX="75.0" layoutY="313.0" prefHeight="40.0" prefWidth="135.0" styleClass="colorCheckingButton" />
+                              <Label alignment="CENTER" layoutX="67.0" layoutY="227.0" prefHeight="30.0" prefWidth="140.0" styleClass="labelsText" text="brush size:" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="clearButton" layoutX="94.0" layoutY="367.0" mnemonicParsing="false" onAction="#clearEachBoard" prefHeight="34.0" prefWidth="103.0" text="Clear board">
+                              <Button fx:id="clearButton" layoutX="94.0" layoutY="367.0" mnemonicParsing="false" onAction="#clearEachBoard" prefHeight="34.0" prefWidth="103.0" styleClass="buttons" text="Clear board">
                                  <font>
                                     <Font size="15.0" />
                                  </font>
@@ -140,22 +144,22 @@
             </AnchorPane>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
-                  <Label fx:id="usernameLabel" layoutX="75.0" layoutY="60.0" prefHeight="30.0" prefWidth="160.0">
+                  <Label fx:id="usernameLabel" layoutX="75.0" layoutY="60.0" prefHeight="30.0" prefWidth="160.0" styleClass="labelsText">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <Label layoutX="75.0" layoutY="30.0" text="username:">
+                  <Label layoutX="75.0" layoutY="30.0" styleClass="labelsText" text="username:">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <Label fx:id="userPointsLabel" layoutX="137.0" layoutY="96.0" prefHeight="30.0" prefWidth="28.0">
+                  <Label fx:id="userPointsLabel" layoutX="137.0" layoutY="96.0" prefHeight="30.0" prefWidth="28.0" styleClass="labelsText">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <Label layoutX="75.0" layoutY="96.0" text="points:">
+                  <Label layoutX="75.0" layoutY="96.0" styleClass="labelsText" text="points:">
                      <font>
                         <Font size="20.0" />
                      </font>

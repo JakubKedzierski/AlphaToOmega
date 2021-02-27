@@ -1,5 +1,30 @@
-.drawingBoardCanvas {
-    -fx-background-color: antiquewhite, white ;
-    -fx-background-insets: 0, 20 ;
-    -fx-padding: 20 ;
+.buttons{
+	-fx-text-fill:  #f0f8ff;
+	-fx-background-color: #a9a9a9;
+    -fx-border-color: #2f4f4f;
+    -fx-border-radius: 5;
+    -fx-padding: 6 6 6 6;
+}
+
+.canvasBoard{
+	-fx-background-color: #f8f8ff;
+	-fx-border-radius: 10;
+	-fx-border-color: #2f4f4f;
+}
+
+.colorCheckingButton{
+	-fx-text-fill:  #dcdcdc;
+	-fx-background-color: #dcdcdc;
+    -fx-border-color: #2f4f4f;
+    -fx-border-radius: 5;
+    -fx-padding: 6 6 6 6;
+}
+
+.globalBackground{
+	-fx-background-color: #f5f5f5;
+}
+
+.labelsText{
+	-fx-text-fill:  #000000;
+	-fx-font-size: 20;
 }

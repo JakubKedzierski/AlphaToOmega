@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -106,6 +107,15 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Pictionary");
 		this.primaryStage.setResizable(false);
+		
+		try {
+			Image gameIcon= new Image(ClassLoader.getSystemResourceAsStream("images/game_icon.png"));
+			primaryStage.getIcons().add(gameIcon);
+		}catch(Exception e) {
+			System.out.println("Trobules with loading game icon");
+			e.printStackTrace();
+		}
+			
 		client = new PictionaryClient(this);
 		
 		initRootLayout();
