@@ -18,77 +18,64 @@ import protocol_parser.PictionaryProtocolParser;
 import protocol_parser.PictionaryProtocolPool;
 import server_side.pictionary.Pictionary;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PictionaryServer.
+ * Server class that handles client connections, takes care of game progress.
+ * 
+ * Server shut down when last user disconnect. Server is run on default user
+ * address:localhost on 25000 port. This server class only accepts connections
+ * with clients, handling connections is moved to <code>ClientHandler</code>
+ * class. 
  */
 public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
-	
-	/** The server port. */
+
+	/** server starts on this port. */
 	public static int SERVER_PORT = 25000;
-	
-	/** The players to start game. */
+
+	/** Number of players to start game. */
 	private int playersToStartGame = 2;
-	
-	/** The disconnected. */
-	private 
- /**
-  * Checks if is disconnected.
-  *
-  * @return true, if is disconnected
-  */
- @Getter boolean disconnected = false;
-	
-	/** The users. */
-	private 
- /**
-  * Gets the users.
-  *
-  * @return the users
-  */
- @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
-	
-	/** The valid users. */
-	private 
- /**
-  * Gets the valid users.
-  *
-  * @return the valid users
-  */
- @Getter int validUsers = 0;
-	
-	/** The game. */
+
+	@Getter
+	/** Trace if server is running. */
+	private boolean running = false;
+
+	@Getter
+	/** List of handlers of users that are connected to server */
+	private ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
+
+	@Getter
+	/** Number of users that already passed through username validation. */
+	private int validUsers = 0;
+
 	private Pictionary game = null;
-	
-	/** The server socket. */
 	private ServerSocket serverSocket = null;
-	
-	/** The accepted connections. */
-	private int acceptedConnections=0;
-	
-	/** The test mode. */
-	private 
- /**
-  * Checks if is test mode.
-  *
-  * @return true, if is test mode
-  */
- @Getter boolean testMode=false;
+
+	/** Amount of already accepted connections. */
+	private int acceptedConnections = 0;
+
+	@Getter
+	/**
+	 * Mode of server: normal:false  | test mode: true
+	 * 
+	 * This variable is used for test purpose to not start game
+	 */
+	private boolean testMode = false;
 
 	/**
-	 * Instantiates a new pictionary server.
+	 * Instantiates a new pictionary server and starts main thread.
 	 *
-	 * @param playersToStartGame the players to start game
-	 * @param testMode the test mode
+	 * @param playersToStartGame number of players to start game
+	 * @param testMode           the test mode: true-normal, false-test mode
 	 */
-	public PictionaryServer(int playersToStartGame,boolean testMode) {
+	public PictionaryServer(int playersToStartGame, boolean testMode) {
 		this.playersToStartGame = playersToStartGame;
-		this.testMode=testMode;
+		this.testMode = testMode;
 		new Thread(this).start();
 	}
 
 	/**
 	 * Instantiates a new pictionary server.
+	 * 
+	 * Starts server main thread
 	 */
 	public PictionaryServer() {
 		new Thread(this).start();
@@ -97,7 +84,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	/**
 	 * The main method.
 	 *
-	 * @param args the arguments
+	 * @param args no use of args in app
 	 */
 	public static void main(String[] args) {
 		new PictionaryServer();
@@ -105,11 +92,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Listetning loop.
+	 * listening loop, accepting new connections
 	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException is thrown when socket error occures
 	 */
-	private void listetningLoop() throws IOException {
+	private void listeningLoop() throws IOException {
 		while (acceptedConnections < playersToStartGame) {
 			Socket clientSocket = serverSocket.accept();
 			acceptedConnections++;
@@ -122,26 +109,28 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Run.
+	 *  Starting server
 	 */
 	@Override
 	public void run() {
-		try  {
+		try {
 			this.serverSocket = new ServerSocket(SERVER_PORT);
 			int port = serverSocket.getLocalPort();
 			String address = InetAddress.getLocalHost().getHostAddress();
 			System.out.println("Server starts on port  " + port);
 			System.out.println("Host address: " + address);
-			
-			if(!testMode)
-			game = new Pictionary(this, playersToStartGame);
 
-			listetningLoop();
+			if (!testMode)
+				game = new Pictionary(this, playersToStartGame);
+
+			listeningLoop();
 
 		} catch (IOException ioException) {
-			
-			if (disconnected) return;
-			else disconnectServer();
+
+			if (running)
+				return;
+			else
+				disconnectServer();
 
 			throw new IllegalArgumentException("Probably another server is listening on this port.");
 		}
@@ -149,9 +138,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Adds the user to game.
+	 * Adding user to game. When all players are connected, <code>startGame</code> is called
 	 *
-	 * @param name the name
+	 * @param name username of new user
 	 */
 	public void addUserToGame(String name) {
 		game.addUser(name);
@@ -162,7 +151,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Start game.
+	 * Start pictionary game.
 	 */
 	public void startGame() {
 		try {
@@ -178,18 +167,19 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Disconnect server.
+	 * Disconnect server and ends any connections with users.
 	 */
 	public void disconnectServer() {
-		disconnected = true;
+		running = true;
 		try {
 
 			for (ClientHandler handler : users) {
 				handler.diconnectClient();
 			}
-			
-			if(serverSocket!=null && !serverSocket.isClosed()) serverSocket.close();
-		
+
+			if (serverSocket != null && !serverSocket.isClosed())
+				serverSocket.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -197,10 +187,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Gets the client handler by id.
+	 * Gets the client handler by username.
 	 *
-	 * @param id the id
-	 * @return the client handler by id
+	 * @param id username 
+	 * @return ClientHanlder which takes care of proper user is returned
 	 */
 	public ClientHandler getClientHandlerById(final String id) {
 		for (ClientHandler handler : users) {
@@ -214,7 +204,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	/**
 	 * Checks if is name taken.
 	 *
-	 * @param userName the user name
+	 * @param userName proposed username
 	 * @return true, if is name taken
 	 */
 	public boolean isNameTaken(String userName) {
@@ -228,9 +218,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Users.
+	 * Get number of client handlers that are running
 	 *
-	 * @return the int
+	 * @return number of users (clients handlers) that are running
 	 */
 	public int users() {
 		return users.size();
@@ -251,11 +241,13 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	 * @param clientHandler the client handler
 	 */
 	public void removeHandler(ClientHandler clientHandler) {
-		if(game!=null && game.isGameRunning()) game.cleanUpAndUnexpectedEndGame();
+		if (game != null && game.isGameRunning())
+			game.cleanUpAndUnexpectedEndGame();
 		users.remove(clientHandler);
 		validUsers--;
-		
-		if(validUsers==0) System.exit(0);
+
+		if (validUsers == 0)
+			System.exit(0);
 	}
 
 	/**
@@ -275,10 +267,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	/**
 	 * Send game info.
 	 *
-	 * @param userId the user id
+	 * @param userId   the user id
 	 * @param gameInfo the game info
 	 * @throws PictionaryException the pictionary exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException         Signals that an I/O exception has occurred.
 	 */
 	public void sendGameInfo(String userId, String gameInfo) throws PictionaryException, IOException {
 		ClientHandler handler = getClientHandlerById(userId);
@@ -289,7 +281,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	 * Send message to client.
 	 *
 	 * @param username the username
-	 * @param message the message
+	 * @param message  the message
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void sendMessageToClient(String username, String message) throws IOException {
@@ -301,7 +293,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	 * Send broadcast message.
 	 *
 	 * @param senderUsername the sender username
-	 * @param message the message
+	 * @param message        the message
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {
@@ -315,7 +307,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	/**
 	 * Check word.
 	 *
-	 * @param word the word
+	 * @param word     the word
 	 * @param username the username
 	 */
 	@Override
@@ -366,11 +358,11 @@ class ClientHandler implements Runnable {
 				}
 			}
 
-		} catch (IOException | ClassNotFoundException |PictionaryException exception) {
+		} catch (IOException | ClassNotFoundException | PictionaryException exception) {
 			System.out.println("Client connecetion failed");
 			server.removeHandler(this);
 			return;
-		} 
+		}
 
 	}
 
@@ -413,7 +405,8 @@ class ClientHandler implements Runnable {
 			} else {
 				username = userDeclaredName;
 				sendMessageFromServerToClient("NameValidation", "OK");
-				if(!server.isTestMode())  server.addUserToGame(userDeclaredName);
+				if (!server.isTestMode())
+					server.addUserToGame(userDeclaredName);
 			}
 		} else {
 			throw new PictionaryException("Message dosent contain name attribute.");

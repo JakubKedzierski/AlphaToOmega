@@ -1,6 +1,8 @@
 package client_side.gui.view_controller;
 
 
+import java.io.IOException;
+
 import client_side.PictionaryClientApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -67,7 +69,11 @@ public class ClientStartUpDialogController {
 		}catch(InterruptedException e) {}
 		
 		if(app.getClient().isValidUsername()) {
-			app.waitForOtherPlayers();
+			try {
+				app.waitForOtherPlayers();
+			} catch (Exception error) {
+				app.informUserAboutFatalErrors(error.getMessage());
+			}
 		}else {
 			invalidUsername();
 		}
