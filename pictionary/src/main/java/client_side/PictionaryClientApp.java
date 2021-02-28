@@ -17,16 +17,44 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import lombok.Getter;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryClientApp.
+ */
 public class PictionaryClientApp extends Application implements ClientApp {
-	private @Getter PictionaryClient client = null;
+	
+	/** The client. */
+	private 
+ /**
+  * Gets the client.
+  *
+  * @return the client
+  */
+ @Getter PictionaryClient client = null;
 
-	private @Getter Stage primaryStage;
+	/** The primary stage. */
+	private /**
+  * Gets the primary stage.
+  *
+  * @return the primary stage
+  */
+ @Getter Stage primaryStage;
+	
+	/** The root layout. */
 	private BorderPane rootLayout;
 
+	/**
+	 * Ask for name.
+	 *
+	 * @return the string
+	 */
 	public String askForName() {
 		return "testName";
 	}
 
+	/**
+	 * Inits the root layout.
+	 */
 	public void initRootLayout() {
 		try {
 
@@ -42,6 +70,9 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		}
 	}
 
+	/**
+	 * Show preview dialog.
+	 */
 	public void showPreviewDialog() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -56,6 +87,9 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		}
 	}
 
+	/**
+	 * Wait for other players.
+	 */
 	public void waitForOtherPlayers() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -70,6 +104,9 @@ public class PictionaryClientApp extends Application implements ClientApp {
 
 	}
 
+	/**
+	 * Start game.
+	 */
 	@Override
 	public void startGame() {
 		
@@ -95,6 +132,12 @@ public class PictionaryClientApp extends Application implements ClientApp {
 	}
 	
 
+	/**
+	 * Start.
+	 *
+	 * @param primaryStage the primary stage
+	 * @throws Exception the exception
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
@@ -125,11 +168,19 @@ public class PictionaryClientApp extends Application implements ClientApp {
 		showPreviewDialog();
 	}
 
+	/**
+	 * Stop.
+	 */
 	@Override
 	public void stop() {
 		client.disconnect();
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}

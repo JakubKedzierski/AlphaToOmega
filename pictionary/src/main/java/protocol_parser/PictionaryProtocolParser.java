@@ -12,11 +12,26 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import server_side.PictionaryException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryProtocolParser.
+ */
 public final class PictionaryProtocolParser {
+	
+	/** The Constant protocolPool. */
 	private static final String[] protocolPool = { "sender", "receiver", "messageType", "message" };
+	
+	/** The Constant messageTypes. */
 	private static final String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation",
 			"gameInfo" };
 
+	/**
+	 * Parses the protocol.
+	 *
+	 * @param jsonMessage the json message
+	 * @return the hash map
+	 * @throws JsonProcessingException the json processing exception
+	 */
 	public static HashMap<PictionaryProtocolPool, String> parseProtocol(String jsonMessage) throws JsonProcessingException  {
 		HashMap<PictionaryProtocolPool, String> parsedMessage = new HashMap<PictionaryProtocolPool, String>();
 
@@ -48,6 +63,17 @@ public final class PictionaryProtocolParser {
 
 	}
 
+	/**
+	 * Creates the protocol message.
+	 *
+	 * @param sender the sender
+	 * @param receiver the receiver
+	 * @param messageType the message type
+	 * @param message the message
+	 * @return the string
+	 * @throws JsonProcessingException the json processing exception
+	 * @throws PictionaryException the pictionary exception
+	 */
 	public static String createProtocolMessage(String sender, String receiver, String messageType, String message) throws JsonProcessingException, PictionaryException {
 
 		if (!Arrays.stream(messageTypes).anyMatch(messageType::equals)) {

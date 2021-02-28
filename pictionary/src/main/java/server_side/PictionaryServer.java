@@ -18,32 +18,97 @@ import protocol_parser.PictionaryProtocolParser;
 import protocol_parser.PictionaryProtocolPool;
 import server_side.pictionary.Pictionary;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryServer.
+ */
 public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
+	
+	/** The server port. */
 	public static int SERVER_PORT = 25000;
+	
+	/** The players to start game. */
 	private int playersToStartGame = 2;
-	private @Getter boolean disconnected = false;
-	private @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
-	private @Getter int validUsers = 0;
+	
+	/** The disconnected. */
+	private 
+ /**
+  * Checks if is disconnected.
+  *
+  * @return true, if is disconnected
+  */
+ @Getter boolean disconnected = false;
+	
+	/** The users. */
+	private 
+ /**
+  * Gets the users.
+  *
+  * @return the users
+  */
+ @Getter ConcurrentLinkedQueue<ClientHandler> users = new ConcurrentLinkedQueue<ClientHandler>();
+	
+	/** The valid users. */
+	private 
+ /**
+  * Gets the valid users.
+  *
+  * @return the valid users
+  */
+ @Getter int validUsers = 0;
+	
+	/** The game. */
 	private Pictionary game = null;
+	
+	/** The server socket. */
 	private ServerSocket serverSocket = null;
+	
+	/** The accepted connections. */
 	private int acceptedConnections=0;
-	private @Getter boolean testMode=false;
+	
+	/** The test mode. */
+	private 
+ /**
+  * Checks if is test mode.
+  *
+  * @return true, if is test mode
+  */
+ @Getter boolean testMode=false;
 
+	/**
+	 * Instantiates a new pictionary server.
+	 *
+	 * @param playersToStartGame the players to start game
+	 * @param testMode the test mode
+	 */
 	public PictionaryServer(int playersToStartGame,boolean testMode) {
 		this.playersToStartGame = playersToStartGame;
 		this.testMode=testMode;
 		new Thread(this).start();
 	}
 
+	/**
+	 * Instantiates a new pictionary server.
+	 */
 	public PictionaryServer() {
 		new Thread(this).start();
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		new PictionaryServer();
 
 	}
 
+	/**
+	 * Listetning loop.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void listetningLoop() throws IOException {
 		while (acceptedConnections < playersToStartGame) {
 			Socket clientSocket = serverSocket.accept();
@@ -56,6 +121,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		}
 	}
 
+	/**
+	 * Run.
+	 */
 	@Override
 	public void run() {
 		try  {
@@ -80,6 +148,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	}
 
+	/**
+	 * Adds the user to game.
+	 *
+	 * @param name the name
+	 */
 	public void addUserToGame(String name) {
 		game.addUser(name);
 		validUsers++;
@@ -88,6 +161,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		}
 	}
 
+	/**
+	 * Start game.
+	 */
 	public void startGame() {
 		try {
 			Thread.sleep(3000);
@@ -101,6 +177,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 	}
 
+	/**
+	 * Disconnect server.
+	 */
 	public void disconnectServer() {
 		disconnected = true;
 		try {
@@ -117,6 +196,12 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		}
 	}
 
+	/**
+	 * Gets the client handler by id.
+	 *
+	 * @param id the id
+	 * @return the client handler by id
+	 */
 	public ClientHandler getClientHandlerById(final String id) {
 		for (ClientHandler handler : users) {
 			if (handler.getUsername() == id) {
@@ -126,6 +211,12 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		return null;
 	}
 
+	/**
+	 * Checks if is name taken.
+	 *
+	 * @param userName the user name
+	 * @return true, if is name taken
+	 */
 	public boolean isNameTaken(String userName) {
 		for (ClientHandler handler : users) {
 			if (userName.equals(handler.getUsername())) {
@@ -136,14 +227,29 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		return false;
 	}
 
+	/**
+	 * Users.
+	 *
+	 * @return the int
+	 */
 	public int users() {
 		return users.size();
 	}
 
+	/**
+	 * Adds the client handler.
+	 *
+	 * @param clientHandler the client handler
+	 */
 	public void addClientHandler(ClientHandler clientHandler) {
 		users.add(clientHandler);
 	}
 
+	/**
+	 * Removes the handler.
+	 *
+	 * @param clientHandler the client handler
+	 */
 	public void removeHandler(ClientHandler clientHandler) {
 		if(game!=null && game.isGameRunning()) game.cleanUpAndUnexpectedEndGame();
 		users.remove(clientHandler);
@@ -152,6 +258,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		if(validUsers==0) System.exit(0);
 	}
 
+	/**
+	 * Gets the users id list.
+	 *
+	 * @return the users id list
+	 */
 	public ArrayList<String> getUsersIdList() {
 		ArrayList<String> nameList = new ArrayList<String>();
 		for (ClientHandler handler : users) {
@@ -161,16 +272,38 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		return nameList;
 	}
 
+	/**
+	 * Send game info.
+	 *
+	 * @param userId the user id
+	 * @param gameInfo the game info
+	 * @throws PictionaryException the pictionary exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void sendGameInfo(String userId, String gameInfo) throws PictionaryException, IOException {
 		ClientHandler handler = getClientHandlerById(userId);
 		handler.sendMessageFromServerToClient("gameInfo", gameInfo);
 	}
 
+	/**
+	 * Send message to client.
+	 *
+	 * @param username the username
+	 * @param message the message
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void sendMessageToClient(String username, String message) throws IOException {
 		ClientHandler handler = getClientHandlerById(username);
 		handler.sendMessageDirectlyToHandledClient(message);
 	}
 
+	/**
+	 * Send broadcast message.
+	 *
+	 * @param senderUsername the sender username
+	 * @param message the message
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {
 		for (ClientHandler handler : users) {
 			if (!handler.getUsername().equals(senderUsername)) {
@@ -179,6 +312,12 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 		}
 	}
 
+	/**
+	 * Check word.
+	 *
+	 * @param word the word
+	 * @param username the username
+	 */
 	@Override
 	public void checkWord(String word, String username) {
 		game.checkWord(word, username);

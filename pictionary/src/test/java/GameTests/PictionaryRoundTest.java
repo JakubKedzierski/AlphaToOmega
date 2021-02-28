@@ -11,11 +11,19 @@ import pictionarySimplifiedClassesForTests.GameCommunicationTestServer;
 import pictionarySimplifiedClassesForTests.PictionaryTestClass;
 import server_side.pictionary.PictionaryRound;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryRoundTest.
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class PictionaryRoundTest {
 
+	/** The game. */
 	PictionaryTestClass game;
 
+	/**
+	 * Sets the up.
+	 */
 	@Before
 	public void setUp() {
 		GameCommunicationTestServer test = new GameCommunicationTestServer();
@@ -24,6 +32,11 @@ public class PictionaryRoundTest {
 			throw new RuntimeException();
 	}
 
+	/**
+	 * Check round duration and word guess.
+	 *
+	 * @throws IndexOutOfBoundsException the index out of bounds exception
+	 */
 	@Test
 	public void checkRoundDurationAndWordGuess() throws IndexOutOfBoundsException
 	{

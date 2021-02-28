@@ -16,8 +16,15 @@ import protocol_parser.PictionaryProtocolParser;
 import protocol_parser.PictionaryProtocolPool;
 import server_side.PictionaryException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class pictionaryProcolParserTest.
+ */
 public class pictionaryProcolParserTest {
 
+	/**
+	 * Should say protocol message is invalid.
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldSayProtocolMessageIsInvalid() {
 		ObjectMapper mapper = new ObjectMapper();
@@ -36,6 +43,11 @@ public class pictionaryProcolParserTest {
 
 	}
 
+	/**
+	 * Should say protocol message can not be parsed by jackson.
+	 *
+	 * @throws JsonProcessingException the json processing exception
+	 */
 	@Test(expected = JsonProcessingException.class)
 	public void shouldSayProtocolMessageCanNotBeParsedByJackson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
@@ -56,6 +68,9 @@ public class pictionaryProcolParserTest {
 
 	}
 	
+	/**
+	 * Should create proper protocol and parse it well.
+	 */
 	@Test
 	public void shouldCreateProperProtocolAndParseItWell() {
 		try {

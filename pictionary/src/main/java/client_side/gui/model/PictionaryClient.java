@@ -18,29 +18,116 @@ import protocol_parser.PictionaryProtocolParser;
 import protocol_parser.PictionaryProtocolPool;
 import server_side.PictionaryException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryClient.
+ */
 public class PictionaryClient implements Runnable {
 
+	/** The server name. */
 	public static String SERVER_NAME = "localhost";
+	
+	/** The server port. */
 	public static int SERVER_PORT = 25000;
+	
+	/** The connection timeout. */
 	public static int CONNECTION_TIMEOUT=2000;
 
-	private @Getter String username;
-	private @Getter Socket socket = null;
-	private @Getter ObjectInputStream inputStream = null;
-	private @Getter ObjectOutputStream outputStream = null;
-	private @Getter boolean connected = false;
-	private @Getter boolean validUsername = false;
-	private @Getter boolean clientType = false; // false graphical/true test
-	private @Setter GameInterfaceController guiController = null;
+	/** The username. */
+	private /**
+  * Gets the username.
+  *
+  * @return the username
+  */
+ @Getter String username;
+	
+	/** The socket. */
+	private 
+ /**
+  * Gets the socket.
+  *
+  * @return the socket
+  */
+ @Getter Socket socket = null;
+	
+	/** The input stream. */
+	private 
+ /**
+  * Gets the input stream.
+  *
+  * @return the input stream
+  */
+ @Getter ObjectInputStream inputStream = null;
+	
+	/** The output stream. */
+	private 
+ /**
+  * Gets the output stream.
+  *
+  * @return the output stream
+  */
+ @Getter ObjectOutputStream outputStream = null;
+	
+	/** The connected. */
+	private 
+ /**
+  * Checks if is connected.
+  *
+  * @return true, if is connected
+  */
+ @Getter boolean connected = false;
+	
+	/** The valid username. */
+	private 
+ /**
+  * Checks if is valid username.
+  *
+  * @return true, if is valid username
+  */
+ @Getter boolean validUsername = false;
+	
+	/** The client type. */
+	private 
+ /**
+  * Checks if is client type.
+  *
+  * @return true, if is client type
+  */
+ @Getter boolean clientType = false; // false graphical/true test
+	
+	/** The gui controller. */
+	private 
+ /**
+  * Sets the gui controller.
+  *
+  * @param guiController the new gui controller
+  */
+ @Setter GameInterfaceController guiController = null;
+	
+	/** The app. */
 	private ClientApp app;
 
+	/**
+	 * Instantiates a new pictionary client.
+	 *
+	 * @param app the app
+	 */
 	public PictionaryClient(ClientApp app) {
 		this.app = app;
 		clientType = false;
 	}
 	
+	/**
+	 * Instantiates a new pictionary client.
+	 */
 	public PictionaryClient() {}
 
+	/**
+	 * Instantiates a new pictionary client.
+	 *
+	 * @param name the name
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public PictionaryClient(String name) throws IOException {
 		clientType = true;
 		
@@ -51,6 +138,11 @@ public class PictionaryClient implements Runnable {
 		validateName(name);
 	}
 
+	/**
+	 * Start client connection.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void startClientConnection() throws IOException {
 		socket = new Socket();
 		SocketAddress addres = new InetSocketAddress(SERVER_NAME, SERVER_PORT);
@@ -63,6 +155,11 @@ public class PictionaryClient implements Runnable {
 		new Thread(this).start();
 	}
 
+	/**
+	 * Validate name.
+	 *
+	 * @param username the username
+	 */
 	public void validateName(String username) {
 		try {
 			this.username = username;
@@ -72,6 +169,9 @@ public class PictionaryClient implements Runnable {
 		}
 	}
 
+	/**
+	 * Run.
+	 */
 	@Override
 	public void run() {
 		try {
@@ -111,6 +211,13 @@ public class PictionaryClient implements Runnable {
 
 	}
 
+	/**
+	 * Parses the protocol message.
+	 *
+	 * @param plainMessage the plain message
+	 * @throws JsonProcessingException the json processing exception
+	 * @throws PictionaryException the pictionary exception
+	 */
 	public void parseProtocolMessage(String plainMessage) throws JsonProcessingException, PictionaryException {
 		HashMap<PictionaryProtocolPool, String> messageInfo = PictionaryProtocolParser.parseProtocol(plainMessage);
 		String messageType = messageInfo.get(PictionaryProtocolPool.MESSAGETYPE);
@@ -206,12 +313,24 @@ public class PictionaryClient implements Runnable {
 
 	}
 
+	/**
+	 * Send message.
+	 *
+	 * @param messageType the message type
+	 * @param message the message
+	 * @param receiver the receiver
+	 * @throws PictionaryException the pictionary exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void sendMessage(String messageType, String message, String receiver)
 			throws PictionaryException, IOException {
 		String jsonMessage = PictionaryProtocolParser.createProtocolMessage(username, receiver, messageType, message);
 		outputStream.writeObject(jsonMessage);
 	}
 
+	/**
+	 * Disconnect.
+	 */
 	public void disconnect() {
 		try {
 			if (inputStream != null && !socket.isClosed())

@@ -12,20 +12,32 @@ import org.mockito.junit.MockitoJUnitRunner;
 import server_side.GameCommunication;
 import server_side.pictionary.Pictionary;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PictionaryGameTest.
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class PictionaryGameTest {
 	
+	/** The server. */
 	@Mock
 	private GameCommunication server;
 	
+	/** The game. */
 	private Pictionary game;
 	
 	
+	/**
+	 * Sets the up.
+	 */
 	@Before
 	public void setUp() {
 		if(server==null) throw new RuntimeException();
 	}
 	
+	/**
+	 * Check illegal user count in game.
+	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void checkIllegalUserCountInGame() {
 		game = new Pictionary(server,4);
@@ -33,6 +45,9 @@ public class PictionaryGameTest {
 		game.startGame();
 	}
 	
+	/**
+	 * Adding too much players.
+	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void addingTooMuchPlayers() {
 		game = new Pictionary(server,2);
@@ -42,6 +57,9 @@ public class PictionaryGameTest {
 		game.addUser("test3");
 	}
 	
+	/**
+	 * Check game duration.
+	 */
 	@Test
 	public void checkGameDuration() {
 		String database[] = {"testWord"};

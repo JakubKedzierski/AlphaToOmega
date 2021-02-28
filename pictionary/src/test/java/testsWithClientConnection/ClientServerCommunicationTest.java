@@ -10,10 +10,18 @@ import org.junit.Test;
 import client_side.gui.model.PictionaryClient;
 import server_side.PictionaryServer;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ClientServerCommunicationTest.
+ */
 public class ClientServerCommunicationTest {
 
+	/** The server. */
 	private PictionaryServer server = null;
 
+	/**
+	 * Checking servers startup.
+	 */
 	@Test
 	public void checkingServersStartup() {
 		try {
@@ -34,6 +42,9 @@ public class ClientServerCommunicationTest {
 
 	}
 	
+	/**
+	 * Users list should be empty.
+	 */
 	@Test
 	public void usersListShouldBeEmpty() {
 		server = new PictionaryServer(4,true);
@@ -71,6 +82,9 @@ public class ClientServerCommunicationTest {
 		
 	}
 	
+	/**
+	 * Should throw exception with listening thread cause of two running servers.
+	 */
 	@Test
 	public void shouldThrowExceptionWithListeningThreadCauseOfTwoRunningServers() {
 		try {

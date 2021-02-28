@@ -29,48 +29,94 @@ import javafx.scene.paint.Color;
 
 import server_side.PictionaryException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GameInterfaceController.
+ */
 public class GameInterfaceController {
 
+	/** The max brush size. */
 	private final int maxBrushSize = 18;
+	
+	/** The min brush size. */
 	private final int minBrushSize = 3;
+	
+	/** The client. */
 	private PictionaryClient client;
 
+	/** The message console field. */
 	@FXML
 	private TextArea messageConsoleField;
+	
+	/** The message typed in field. */
 	@FXML
 	private TextField messageTypedInField;
+	
+	/** The guess word field. */
 	@FXML
 	private TextField guessWordField;
+	
+	/** The guess word button. */
 	@FXML
 	private Button guessWordButton;
+	
+	/** The clear button. */
 	@FXML
 	private Button clearButton;
+	
+	/** The round label. */
 	@FXML
 	private Label roundLabel;
+	
+	/** The type of player label. */
 	@FXML
 	private Label typeOfPlayerLabel;
+	
+	/** The username label. */
 	@FXML
 	private Label usernameLabel;
+	
+	/** The drawing board canvas. */
 	@FXML
 	private Canvas drawingBoardCanvas;
+	
+	/** The user points label. */
 	@FXML
 	private Label userPointsLabel;
+	
+	/** The guessing word info label. */
 	@FXML
 	private Label guessingWordInfoLabel;
+	
+	/** The guessing word label. */
 	@FXML
 	private Label guessingWordLabel;
+	
+	/** The brush size slider. */
 	@FXML
 	private Slider brushSizeSlider;
+	
+	/** The brush color picker. */
 	@FXML
 	private ColorPicker brushColorPicker;
+	
+	/** The progress bar. */
 	@FXML
 	private ProgressBar progressBar;
 
+	/**
+	 * Sets the client.
+	 *
+	 * @param client the new client
+	 */
 	public void setClient(PictionaryClient client) {
 		this.client = client;
 		usernameLabel.setText(client.getUsername());
 	}
 
+	/**
+	 * Initialize.
+	 */
 	@FXML
 	private void initialize() {
 
@@ -96,6 +142,11 @@ public class GameInterfaceController {
 		brushColorPicker.setValue(Color.BLACK);
 	}
 
+	/**
+	 * Send message on enter pressed.
+	 *
+	 * @param event the event
+	 */
 	@FXML
 	public void sendMessageOnEnterPressed(KeyEvent event) {
 		if (event.getCode().equals(KeyCode.ENTER)) {
@@ -103,6 +154,9 @@ public class GameInterfaceController {
 		}
 	}
 
+	/**
+	 * Send message.
+	 */
 	@FXML
 	public void sendMessage() {
 
@@ -118,6 +172,9 @@ public class GameInterfaceController {
 		}
 	}
 
+	/**
+	 * Guess word.
+	 */
 	@FXML
 	public void guessWord() {
 		if (guessWordField.getText() != null || guessWordField.getText().length() != 0) {
@@ -133,6 +190,11 @@ public class GameInterfaceController {
 		}
 	}
 
+	/**
+	 * Draw rectangle.
+	 *
+	 * @param mouse the mouse
+	 */
 	@FXML
 	public void drawRectangle(MouseEvent mouse) {
 		if (typeOfPlayerLabel.getText().equals("listener"))
@@ -153,6 +215,9 @@ public class GameInterfaceController {
 		}
 	}
 
+	/**
+	 * Clear each board.
+	 */
 	@FXML
 	public void clearEachBoard() {
 		cleanBoard();
@@ -164,6 +229,12 @@ public class GameInterfaceController {
 		}
 	}
 
+	/**
+	 * Sets the progress bar value.
+	 *
+	 * @param value the value
+	 * @param maxValue the max value
+	 */
 	public void setProgressBarValue(double value, double maxValue) {
 		Platform.runLater(() -> {
 			double progress = value / maxValue;
@@ -171,6 +242,9 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * Clean board.
+	 */
 	public void cleanBoard() {
 		Platform.runLater(() -> {
 			GraphicsContext gc = drawingBoardCanvas.getGraphicsContext2D();
@@ -178,6 +252,9 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * Good guess done.
+	 */
 	public void goodGuessDone() {
 		Platform.runLater(() -> {
 			guessWordButton.setDisable(true);
@@ -185,6 +262,14 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * Draw image from host.
+	 *
+	 * @param x the x
+	 * @param y the y
+	 * @param size the size
+	 * @param color the color
+	 */
 	public void drawImageFromHost(double x, double y, double size, String color) {
 		if (typeOfPlayerLabel.getText().equals("host"))
 			return;
@@ -194,6 +279,11 @@ public class GameInterfaceController {
 		gc.fillRect(x, y, size, size);
 	}
 
+	/**
+	 * Show word to guess.
+	 *
+	 * @param word the word
+	 */
 	public void showWordToGuess(String word) {
 
 		Platform.runLater(() -> {
@@ -206,6 +296,11 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * End game.
+	 *
+	 * @param winner the winner
+	 */
 	public void endGame(String winner) {
 		Platform.runLater(() -> {
 			ButtonType endGame = new ButtonType("End game");
@@ -225,6 +320,9 @@ public class GameInterfaceController {
 
 	}
 
+	/**
+	 * Sets the host view.
+	 */
 	public void setHostView() {
 		Platform.runLater(() -> {
 			guessWordField.setDisable(true);
@@ -238,6 +336,9 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * Sets the listener view.
+	 */
 	public void setListenerView() {
 		Platform.runLater(() -> {
 			guessWordField.setDisable(false);
@@ -251,18 +352,33 @@ public class GameInterfaceController {
 		});
 	}
 
+	/**
+	 * Show round.
+	 *
+	 * @param round the round
+	 */
 	public void showRound(String round) {
 		Platform.runLater(() -> {
 			roundLabel.setText(round);
 		});
 	}
 
+	/**
+	 * Sets the points.
+	 *
+	 * @param points the new points
+	 */
 	public void setPoints(int points) {
 		Platform.runLater(() -> {
 			userPointsLabel.setText(Integer.toString(points));
 		});
 	}
 
+	/**
+	 * Adds the message.
+	 *
+	 * @param message the message
+	 */
 	public void addMessage(String message) {
 
 		if (message != null) {

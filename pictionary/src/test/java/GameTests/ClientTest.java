@@ -10,10 +10,18 @@ import client_side.gui.model.PictionaryClient;
 import protocol_parser.PictionaryProtocolParser;
 import server_side.PictionaryException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ClientTest.
+ */
 public class ClientTest {
 
+	/** The client. */
 	PictionaryClient client = new PictionaryClient();
 	
+	/**
+	 * Check proper parsing.
+	 */
 	@Test
 	public void checkProperParsing() {
 		try {

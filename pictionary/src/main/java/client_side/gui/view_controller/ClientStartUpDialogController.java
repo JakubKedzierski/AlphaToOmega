@@ -8,21 +8,38 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ClientStartUpDialogController.
+ */
 public class ClientStartUpDialogController {
 	
+	/** The username field. */
 	@FXML
 	private TextField usernameField;
 
+	/** The app. */
 	private PictionaryClientApp app;
 
+	/**
+	 * Initialize.
+	 */
 	@FXML
 	private void initialize() {
 	}
 
+	/**
+	 * Sets the main app.
+	 *
+	 * @param mainApp the new main app
+	 */
 	public void setMainApp(PictionaryClientApp mainApp) {
 		this.app = mainApp;
 	}
 	
+	/**
+	 * Invalid username.
+	 */
 	private void invalidUsername() {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(app.getPrimaryStage());
@@ -32,6 +49,9 @@ public class ClientStartUpDialogController {
 		alert.showAndWait();
 	}
 
+	/**
+	 * Handle new username.
+	 */
 	@FXML
 	public void handleNewUsername() {
 		if(usernameField.getText() == null || usernameField.getText().length()==0){
@@ -52,6 +72,10 @@ public class ClientStartUpDialogController {
 			invalidUsername();
 		}
 	}
+	
+	/**
+	 * Start.
+	 */
 	public void start() {
 		app.startGame();
 	}
