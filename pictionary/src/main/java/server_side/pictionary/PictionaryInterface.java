@@ -1,8 +1,7 @@
 package server_side.pictionary;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface PictionaryInterface.
+ *  Interface for round-game callbacks
  */
 public interface PictionaryInterface {
 	
@@ -14,7 +13,7 @@ public interface PictionaryInterface {
 	/**
 	 * Send periodic time info.
 	 *
-	 * @param whichPeriod the which period
+	 * @param whichPeriod period
 	 * @param numberOfPeriods the number of periods
 	 */
 	public void sendPeriodicTimeInfo(int whichPeriod,int numberOfPeriods);

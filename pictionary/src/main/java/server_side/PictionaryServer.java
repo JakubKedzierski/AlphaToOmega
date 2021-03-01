@@ -21,9 +21,9 @@ import server_side.pictionary.Pictionary;
 /**
  * Server class that handles client connections, takes care of game progress.
  * 
- * Server shut down when last user disconnect. Server is run on default user
+ * Server shut down when last user disconnect (check method <code>removeHandler</code>). Server is run on default user
  * address:localhost on 25000 port. This server class only accepts connections
- * with clients, handling connections is moved to <code>ClientHandler</code>
+ * with clients, handling connections is moved to private <code>ClientHandler</code>
  * class. 
  */
 public class PictionaryServer implements Runnable, GameCommunication, ServerHandlerInterface {
@@ -236,7 +236,7 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Removes the handler.
+	 * Removes the handler if number of handler is 0, server shut down
 	 *
 	 * @param clientHandler the client handler
 	 */
@@ -251,9 +251,9 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Gets the users id list.
+	 * Gets list of usernames (ask each handler for username)
 	 *
-	 * @return the users id list
+	 * @return the users username list
 	 */
 	public ArrayList<String> getUsersIdList() {
 		ArrayList<String> nameList = new ArrayList<String>();
@@ -265,24 +265,26 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Send game info.
+	 * Send game info/stage game info.
+	 * 
+	 * This method is used by game class to inform client about game status, new stage etc.
 	 *
-	 * @param userId   the user id
-	 * @param gameInfo the game info
-	 * @throws PictionaryException the pictionary exception
-	 * @throws IOException         Signals that an I/O exception has occurred.
+	 * @param username  username of player to send message
+	 * @param gameInfo game information
+	 * @throws PictionaryException the pictionary exception thrown when parsing message goes wrong
+	 * @throws IOException  if socket is closed IOException is thrown
 	 */
-	public void sendGameInfo(String userId, String gameInfo) throws PictionaryException, IOException {
-		ClientHandler handler = getClientHandlerById(userId);
+	public void sendGameInfo(String username, String gameInfo) throws PictionaryException, IOException {
+		ClientHandler handler = getClientHandlerById(username);
 		handler.sendMessageFromServerToClient("gameInfo", gameInfo);
 	}
 
 	/**
-	 * Send message to client.
+	 * Send server message to client.
 	 *
-	 * @param username the username
-	 * @param message  the message
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @param username username of player to send message
+	 * @param message  message to be sent
+	 * @throws IOException if socket is closed IOException is thrown
 	 */
 	public void sendMessageToClient(String username, String message) throws IOException {
 		ClientHandler handler = getClientHandlerById(username);
@@ -290,11 +292,11 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Send broadcast message.
+	 * Send broadcast message to each user (every handler send message to user that is handled)
 	 *
-	 * @param senderUsername the sender username
-	 * @param message        the message
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @param senderUsername sender username
+	 * @param message   message to be sent
+	 * @throws IOException if socket is closed IOException is thrown
 	 */
 	public void sendBroadcastMessage(String senderUsername, String message) throws IOException {
 		for (ClientHandler handler : users) {
@@ -305,10 +307,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 	}
 
 	/**
-	 * Check word.
+	 * Checking if word guessed by user is proper
 	 *
-	 * @param word     the word
-	 * @param username the username
+	 * @param word     guessing word
+	 * @param username username of guessing player
 	 */
 	@Override
 	public void checkWord(String word, String username) {
@@ -317,6 +319,10 @@ public class PictionaryServer implements Runnable, GameCommunication, ServerHand
 
 }
 
+/**
+ *  Handling user connections, forwarding messages, checking connection status
+ *
+ */
 @EqualsAndHashCode
 class ClientHandler implements Runnable {
 
@@ -332,7 +338,10 @@ class ClientHandler implements Runnable {
 		this.socket = socket;
 		new Thread(this).start();
 	}
-
+	
+	/**
+	 *  main loop where handler receives and parses messages and inits name validation
+	 */
 	@Override
 	public void run() {
 		try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -366,6 +375,13 @@ class ClientHandler implements Runnable {
 
 	}
 
+	/**
+	 * processing name validation, sending validation messages to user
+	 * 
+	 * @param userDeclaredName name declared by user
+	 * @throws PictionaryException thrown when wrapping goes wrong
+	 * @throws IOException thrown when connections is lost
+	 */
 	public void nameValidation(String userDeclaredName) throws PictionaryException, IOException {
 		while (server.isNameTaken(userDeclaredName)) {
 
@@ -421,7 +437,8 @@ class ClientHandler implements Runnable {
 					message);
 			sendMessageDirectlyToHandledClient(jsonMessage);
 		} catch (JsonProcessingException exception) {
-			throw new PictionaryException("Wrong message atributes");
+			exception.printStackTrace();
+			throw new PictionaryException("Processing exception");
 		}
 	}
 

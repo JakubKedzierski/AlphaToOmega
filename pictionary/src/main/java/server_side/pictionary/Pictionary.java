@@ -10,86 +10,55 @@ import lombok.Setter;
 import server_side.GameCommunication;
 import server_side.PictionaryException;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Pictionary.
+ * Pictionary game
+ * 
+ * Starts on server and inform server/clients about game progress, events.
+ * Main goal of game is simple - host has to draw choosen word and listeners have to guess what
+ * the word is. Good guess makes 2 points and host get extra one point. The winner of the game is player who
+ * has most the most points.
  */
 public class Pictionary implements PictionaryInterface {
-	
-	/** The number of players. */
-	private 
- /**
-  * Sets the number of players.
-  *
-  * @param NUMBER_OF_PLAYERS the new number of players
-  */
- @Setter int NUMBER_OF_PLAYERS = 2;
-	
-	/** The number of rounds. */
-	private 
- /**
-  * Sets the number of rounds.
-  *
-  * @param NUMBER_OF_ROUNDS the new number of rounds
-  */
- @Setter int NUMBER_OF_ROUNDS = 2;
-	
-	/** The round time. */
-	private 
- /**
-  * Sets the round time.
-  *
-  * @param ROUND_TIME the new round time
-  */
- @Setter int ROUND_TIME=60*1000;
 
+	@Setter
+	/** The number of players. */
+	private int NUMBER_OF_PLAYERS = 2;
+
+	@Setter 
+	/** The number of rounds. */
+	private int NUMBER_OF_ROUNDS = 2;
+
+	@Setter
+	/** The round time. */
+	private int ROUND_TIME = 60 * 1000;
+
+	@Setter 
 	/** The word database. */
-	private /**
-  * Sets the word database.
-  *
-  * @param wordDatabase the new word database
-  */
- @Setter String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
-	
-	/** The users. */
+	private String[] wordDatabase = { "rabbit", "house", "river", "shrek" };
+
+	/** The users who participate in game. */
 	private List<PictionaryPlayer> users;
-	
+
 	/** The server. */
 	private GameCommunication server;
-	
-	/** The round count. */
-	private 
- /**
-  * Gets the round count.
-  *
-  * @return the round count
-  */
- @Getter int roundCount;
-	
-	/** The round. */
-	private 
- /**
-  * Gets the round.
-  *
-  * @return the round
-  */
- @Getter PictionaryRound round = null;
-	
-	/** The game running. */
-	private 
- /**
-  * Checks if is game running.
-  *
-  * @return true, if is game running
-  */
- @Getter boolean gameRunning = false;
 
+	@Getter
+	/** The round counter. */
+	private int roundCount;
+
+	@Getter
+	/** The round. */
+	private PictionaryRound round = null;
+
+	@Getter
+	/** The game running. */
+	private boolean gameRunning = false;
 
 	/**
-	 * Instantiates a new pictionary.
+	 * Instantiates a new pictionary game.
 	 *
-	 * @param server the server
-	 * @param numberOfPlayers the number of players
+	 * @param server          the server that is used to communication 
+	 * @param numberOfPlayers the number of players to start game 
 	 */
 	public Pictionary(GameCommunication server, int numberOfPlayers) {
 		this.server = server;
@@ -99,9 +68,9 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Adds the user.
+	 * Adds the user to game.
 	 *
-	 * @param name the name
+	 * @param name username
 	 */
 	public void addUser(String name) {
 		if (users.size() < NUMBER_OF_PLAYERS) {
@@ -113,9 +82,9 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Delete user.
+	 * Delete user from game.
 	 *
-	 * @param name the name
+	 * @param name username
 	 */
 	public void deleteUser(String name) {
 		for (PictionaryPlayer user : users) {
@@ -136,7 +105,7 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Start game.
+	 * Starts game.
 	 */
 	public void startGame() {
 		if (users.size() == NUMBER_OF_PLAYERS && server != null) {
@@ -149,15 +118,17 @@ public class Pictionary implements PictionaryInterface {
 
 	/**
 	 * Game loop.
+	 * 
+	 * Loop break when last round ends.
 	 */
 	private void gameLoop() {
 		chooseNewHost();
-		round = new PictionaryRound(ROUND_TIME,wordDatabase[roundCount], this);
+		round = new PictionaryRound(ROUND_TIME, wordDatabase[roundCount], this);
 		roundCount++;
 	}
 
 	/**
-	 * Choose new host.
+	 * Choose new host in new round.
 	 */
 	private void chooseNewHost() {
 		for (int i = 0; i < users.size(); i++) {
@@ -184,7 +155,7 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Check word.
+	 * Check if guessed word is proper.
 	 *
 	 * @param word the word
 	 * @param name the name
@@ -213,7 +184,7 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Round ended.
+	 *  Collects infomations after round ends
 	 */
 	public void roundEnded() {
 		PictionaryPlayer host = getHost();
@@ -238,7 +209,7 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Clean up and unexpected end game.
+	 * Clean up after unexpected end game.
 	 */
 	public void cleanUpAndUnexpectedEndGame() {
 		if (round.isRunning())
@@ -262,7 +233,7 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Gets the host.
+	 * Gets the host of game.
 	 *
 	 * @return the host
 	 */
@@ -276,10 +247,10 @@ public class Pictionary implements PictionaryInterface {
 	}
 
 	/**
-	 * Send game status info.
+	 * Send game status info to client.
 	 *
 	 * @param username the username
-	 * @param message the message
+	 * @param message  the message/game status/inforamtion
 	 */
 	private void sendGameStatusInfo(String username, String message) {
 		if (!gameRunning)
@@ -295,7 +266,7 @@ public class Pictionary implements PictionaryInterface {
 	/**
 	 * Send periodic time info.
 	 *
-	 * @param whichPeriod the which period
+	 * @param whichPeriod     period
 	 * @param numberOfPeriods the number of periods
 	 */
 	@Override

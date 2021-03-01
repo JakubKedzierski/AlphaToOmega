@@ -5,32 +5,33 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import server_side.PictionaryException;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class PictionaryProtocolParser.
+ *  Parser that helps with creating/parsing proper message protocols during client-server communication
+ *  
+ *  Proper message protocol contains specified protocolPools and have a proper type
  */
 public final class PictionaryProtocolParser {
 	
-	/** The Constant protocolPool. */
+	/** The Constant protocolPool - message must contains each of listed pool */
 	private static final String[] protocolPool = { "sender", "receiver", "messageType", "message" };
 	
-	/** The Constant messageTypes. */
+	/** The Constant messageTypes - message must have one type*/
 	private static final String[] messageTypes = { "chat", "pixelVector", "guessedWord", "Error", "NameValidation",
 			"gameInfo" };
 
 	/**
-	 * Parses the protocol.
+	 * Parses received message according to the protocol.
 	 *
-	 * @param jsonMessage the json message
-	 * @return the hash map
-	 * @throws JsonProcessingException the json processing exception
+	 * @param jsonMessage the json message received by client/server
+	 * @return the hash map that contains pool:message/info 
+	 * @throws JsonProcessingException the json processing exception throws when processing goes wrong
 	 */
 	public static HashMap<PictionaryProtocolPool, String> parseProtocol(String jsonMessage) throws JsonProcessingException  {
 		HashMap<PictionaryProtocolPool, String> parsedMessage = new HashMap<PictionaryProtocolPool, String>();
@@ -64,15 +65,15 @@ public final class PictionaryProtocolParser {
 	}
 
 	/**
-	 * Creates the protocol message.
+	 * Creates the proper valid message that can be send by server/client during communication.
 	 *
-	 * @param sender the sender
+	 * @param sender the sender 
 	 * @param receiver the receiver
 	 * @param messageType the message type
 	 * @param message the message
-	 * @return the string
-	 * @throws JsonProcessingException the json processing exception
-	 * @throws PictionaryException the pictionary exception
+	 * @return the string - proper message that can be parsed by parser method
+	 * @throws JsonProcessingException the json processing exception throws when processing goes wrong
+	 * @throws PictionaryException the pictionary exception throws when processing goes wrong
 	 */
 	public static String createProtocolMessage(String sender, String receiver, String messageType, String message) throws JsonProcessingException, PictionaryException {
 

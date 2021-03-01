@@ -1,100 +1,83 @@
 package server_side.pictionary;
 
-
 import java.util.Timer;
 import java.util.TimerTask;
 
 import lombok.Getter;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PictionaryRound.
+ * Represents round during pictionary game.
+ * 
+ * Main purpose is to take care of round time and inform game when time ends
  */
-public class PictionaryRound{
-	
+public class PictionaryRound {
+
 	/** The timers periods on one round. */
-	public static int TIMERS_PERIODS_ON_ONE_ROUND=10;
-	
+	public static int TIMERS_PERIODS_ON_ONE_ROUND = 10;
+
 	/** The timer periods counter. */
-	private int timerPeriodsCounter=0;
-	
+	private int timerPeriodsCounter = 0;
+
 	/** The word to guess. */
 	private String wordToGuess;
-	
+
 	/** The timer. */
 	private Timer timer;
-	
-	/** The running. */
-	private 
- /**
-  * Checks if is running.
-  *
-  * @return true, if is running
-  */
- @Getter boolean running = false;
-	
-	/** The round time. */
-	private 
- /**
-  * Gets the round time.
-  *
-  * @return the round time
-  */
- @Getter long roundTime = 60 * 1000;
-	
-	/** The good guess count. */
-	private 
- /**
-  * Gets the good guess count.
-  *
-  * @return the good guess count
-  */
- @Getter int goodGuessCount = 0;
-	
-	/** The pictionary. */
-	private PictionaryInterface pictionary;  // to make callback after round ends
 
+	@Getter
+	/** check if round is running or round ended. */
+	private boolean running = false;
+
+	@Getter
+	/** The round time. */
+	private long roundTime = 60 * 1000;
+
+	@Getter
+	/** The good guess count. */
+	private int goodGuessCount = 0;
+
+	/** The pictionary - used to make few callbacks */
+	private PictionaryInterface pictionary; 
 
 	/**
 	 * Instantiates a new pictionary round.
 	 *
-	 * @param roundTime the round time
+	 * @param roundTime   the round time
 	 * @param wordToGuess the word to guess
-	 * @param pictionary the pictionary
+	 * @param pictionary  the pictionary
 	 */
 	public PictionaryRound(long roundTime, String wordToGuess, PictionaryInterface pictionary) {
 		this.roundTime = roundTime;
 		this.wordToGuess = wordToGuess;
-		this.pictionary=pictionary;
-		
+		this.pictionary = pictionary;
+
 		running = true;
-	    TimerTask task = new TimerTask() {
-	    	public void run() {
-	    		timerPeriodsCounter++;
-	    		pictionary.sendPeriodicTimeInfo(timerPeriodsCounter, TIMERS_PERIODS_ON_ONE_ROUND);
-	    		
-		    	if(timerPeriodsCounter>=TIMERS_PERIODS_ON_ONE_ROUND)
-		    		endRound();
-	        }
-	    };
-		
+		TimerTask task = new TimerTask() {
+			public void run() {
+				timerPeriodsCounter++;
+				pictionary.sendPeriodicTimeInfo(timerPeriodsCounter, TIMERS_PERIODS_ON_ONE_ROUND);
+
+				if (timerPeriodsCounter >= TIMERS_PERIODS_ON_ONE_ROUND)
+					endRound();
+			}
+		};
+
 		timer = new Timer();
-		timer.scheduleAtFixedRate(task,0,roundTime/TIMERS_PERIODS_ON_ONE_ROUND);
+		timer.scheduleAtFixedRate(task, 0, roundTime / TIMERS_PERIODS_ON_ONE_ROUND);
 	}
-	
 
 	/**
-	 * End round.
+	 * Ends round and clean stuff
 	 */
 	public void endRound() {
 		running = false;
-		timer.cancel();timer.purge();
+		timer.cancel();
+		timer.purge();
 		pictionary.roundEnded();
 	}
-	
 
 	/**
-	 * Guessed word.
+	 * check if guessing word is proper
 	 *
 	 * @param word the word
 	 * @return true, if successful
@@ -102,7 +85,7 @@ public class PictionaryRound{
 	public boolean guessedWord(String word) {
 		if (running) {
 			if (word.equals(wordToGuess)) {
-				goodGuessCount++; 
+				goodGuessCount++;
 				return true;
 			}
 		} else {
@@ -111,6 +94,5 @@ public class PictionaryRound{
 
 		return false;
 	}
-
 
 }

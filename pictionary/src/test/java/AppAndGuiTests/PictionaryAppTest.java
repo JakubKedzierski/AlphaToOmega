@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 //https://stackoverflow.com/questions/28501307/javafx-toolkit-not-initialized-in-one-test-class-but-not-two-others-where-is
 // need testFx framework
 
-
+/*
 
 public class PictionaryAppTest extends PictionaryClientApp{
 	
@@ -57,3 +57,5 @@ public class PictionaryAppTest extends PictionaryClientApp{
 	}
 	
 }
+
+*/

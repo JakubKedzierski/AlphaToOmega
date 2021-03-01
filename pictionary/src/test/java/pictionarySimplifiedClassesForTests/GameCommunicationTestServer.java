@@ -5,7 +5,7 @@ import java.io.IOException;
 import server_side.GameCommunication;
 import server_side.PictionaryException;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class GameCommunicationTestServer.
  */

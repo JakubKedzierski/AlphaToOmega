@@ -1,8 +1,5 @@
 package client_side.gui.view_controller;
 
-
-import java.io.IOException;
-
 import client_side.PictionaryClientApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -10,9 +7,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class ClientStartUpDialogController.
+ *  Starting window controller
+ *  
+ *  Controller is responsible for controlling first stage window and startup dialog with user
  */
 public class ClientStartUpDialogController {
 	
@@ -40,7 +38,7 @@ public class ClientStartUpDialogController {
 	}
 	
 	/**
-	 * Invalid username.
+	 *  Alert thrown when username is invalid
 	 */
 	private void invalidUsername() {
 		Alert alert = new Alert(AlertType.WARNING);
@@ -52,7 +50,7 @@ public class ClientStartUpDialogController {
 	}
 
 	/**
-	 * Handle new username.
+	 * handling and getting new username from user
 	 */
 	@FXML
 	public void handleNewUsername() {
@@ -80,7 +78,8 @@ public class ClientStartUpDialogController {
 	}
 	
 	/**
-	 * Start.
+	 * starting app when validation is done
+	 * 
 	 */
 	public void start() {
 		app.startGame();

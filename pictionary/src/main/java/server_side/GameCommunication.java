@@ -2,9 +2,8 @@ package server_side;
 
 import java.io.IOException;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface GameCommunication.
+ *  Server imitations that alows game to make callbacks 
  */
 public interface GameCommunication {
 	
@@ -14,9 +13,9 @@ public interface GameCommunication {
 	public void startGame();
 	
 	/**
-	 * Send game info.
+	 * Send game info/status.
 	 *
-	 * @param userId the user id
+	 * @param userId username
 	 * @param gameInfo the game info
 	 * @throws PictionaryException the pictionary exception
 	 * @throws IOException Signals that an I/O exception has occurred.

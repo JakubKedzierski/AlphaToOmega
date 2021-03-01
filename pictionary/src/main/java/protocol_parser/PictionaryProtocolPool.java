@@ -1,17 +1,16 @@
 package protocol_parser;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Enum PictionaryProtocolPool.
+ *  Proper client/server communication message have to contain each of these pools
  */
 public enum PictionaryProtocolPool {
-	
+
 	/** The sender. */
-	SENDER(), 
- /** The receiver. */
- RECEIVER(), 
- /** The messagetype. */
- MESSAGETYPE(), 
- /** The message. */
- MESSAGE();
+	SENDER(),
+	/** The receiver. */
+	RECEIVER(),
+	/** The messagetype. */
+	MESSAGETYPE(),
+	/** The message. */
+	MESSAGE();
 }

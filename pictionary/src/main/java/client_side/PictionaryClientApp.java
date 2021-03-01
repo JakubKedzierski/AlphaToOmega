@@ -3,6 +3,7 @@ package client_side;
 import client_side.gui.model.PictionaryClient;
 import client_side.gui.view_controller.ClientStartUpDialogController;
 import client_side.gui.view_controller.GameInterfaceController;
+import client_side.gui.view_controller.RootLayoutController;
 
 import java.io.IOException;
 import javafx.application.Application;
@@ -51,6 +52,9 @@ public class PictionaryClientApp extends Application implements ClientApp {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("gui/view_controller/RootLayout.fxml"));
 			rootLayout = (BorderPane) loader.load();
+			
+			RootLayoutController controller = loader.getController();
+			controller.setApp(this);
 
 			Scene scene = new Scene(rootLayout);
 			primaryStage.setScene(scene);

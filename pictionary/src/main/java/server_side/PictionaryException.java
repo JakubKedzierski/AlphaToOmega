@@ -1,8 +1,8 @@
 package server_side;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class PictionaryException.
+ * Project main exception.
  */
 public class PictionaryException extends Exception {
 

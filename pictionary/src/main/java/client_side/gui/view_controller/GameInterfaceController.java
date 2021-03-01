@@ -29,9 +29,11 @@ import javafx.scene.paint.Color;
 
 import server_side.PictionaryException;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class GameInterfaceController.
+ *  Main window (game stage) controller
+ *  
+ *  Controller is responsible for getting actions from user and executing orders from client
  */
 public class GameInterfaceController {
 
@@ -115,7 +117,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Initialize.
+	 * Initialize JavaFx properties.
 	 */
 	@FXML
 	private void initialize() {
@@ -155,7 +157,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Send message.
+	 * Send message from field.
 	 */
 	@FXML
 	public void sendMessage() {
@@ -173,7 +175,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Guess word.
+	 *  guess word that was typed by user in special guessWordField.
 	 */
 	@FXML
 	public void guessWord() {
@@ -191,9 +193,11 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Draw rectangle.
+	 * Drawing rectangles when user drags/click on special drawing area.
 	 *
-	 * @param mouse the mouse
+	 * This allows drawing images on drawing area.
+	 *
+	 * @param mouse mouse event information
 	 */
 	@FXML
 	public void drawRectangle(MouseEvent mouse) {
@@ -216,7 +220,9 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Clear each board.
+	 * Clearing user board as well as others users board 
+	 * 
+	 * available only when user is host.
 	 */
 	@FXML
 	public void clearEachBoard() {
@@ -231,9 +237,12 @@ public class GameInterfaceController {
 
 	/**
 	 * Sets the progress bar value.
+	 * 
+	 * Bar indicates progress in pictionary round (time to end)
+	 * value/maxValue - percantage of progress bar 
 	 *
-	 * @param value the value
-	 * @param maxValue the max value
+	 * @param value 
+	 * @param maxValue
 	 */
 	public void setProgressBarValue(double value, double maxValue) {
 		Platform.runLater(() -> {
@@ -243,7 +252,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Clean board.
+	 * Clean only user board
 	 */
 	public void cleanBoard() {
 		Platform.runLater(() -> {
@@ -253,7 +262,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Good guess done.
+	 *  enabling/disabling proper field when good guess is done
 	 */
 	public void goodGuessDone() {
 		Platform.runLater(() -> {
@@ -263,10 +272,10 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Draw image from host.
+	 * Drawing rectangle from host.
 	 *
-	 * @param x the x
-	 * @param y the y
+	 * @param x  x position 
+	 * @param y  y position
 	 * @param size the size
 	 * @param color the color
 	 */
@@ -280,9 +289,9 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Show word to guess.
+	 * Show user word that user has to draw on board.
 	 *
-	 * @param word the word
+	 * @param word word to guess by other users
 	 */
 	public void showWordToGuess(String word) {
 
@@ -297,9 +306,9 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * End game.
+	 * Ends game and shows user end game dialog
 	 *
-	 * @param winner the winner
+	 * @param winner the winner of game
 	 */
 	public void endGame(String winner) {
 		Platform.runLater(() -> {
@@ -322,6 +331,9 @@ public class GameInterfaceController {
 
 	/**
 	 * Sets the host view.
+	 * 
+	 * disable/enable special fields/areas
+	 * 
 	 */
 	public void setHostView() {
 		Platform.runLater(() -> {
@@ -338,6 +350,8 @@ public class GameInterfaceController {
 
 	/**
 	 * Sets the listener view.
+	 * 
+	 * disable/enable special fields/areas
 	 */
 	public void setListenerView() {
 		Platform.runLater(() -> {
@@ -353,7 +367,7 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Show round.
+	 * Show round infromation.
 	 *
 	 * @param round the round
 	 */
@@ -366,7 +380,7 @@ public class GameInterfaceController {
 	/**
 	 * Sets the points.
 	 *
-	 * @param points the new points
+	 * @param points new points 
 	 */
 	public void setPoints(int points) {
 		Platform.runLater(() -> {
@@ -375,9 +389,9 @@ public class GameInterfaceController {
 	}
 
 	/**
-	 * Adds the message.
+	 * Adds the message to message field
 	 *
-	 * @param message the message
+	 * @param message new message
 	 */
 	public void addMessage(String message) {
 

@@ -4,54 +4,31 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @EqualsAndHashCode
+/**
+ * Aggregation class that represents pictionary player
+ *
+ */
 public class PictionaryPlayer implements Comparable<PictionaryPlayer> {
 
-	/**
-	 * Gets the name.
-	 *
-	 * @return the name
-	 */
-	private @Getter String name = null;
-
-	/** The type of player. */
-	private
-	/**
-	 * Gets the type of player.
-	 *
-	 * @return the type of player
-	 */
 	@Getter
-	/**
-	 * Sets the type of player.
-	 *
-	 * @param typeOfPlayer the new type of player
-	 */
-	@Setter String typeOfPlayer = null;
+	/** username */
+	private String name = null;
 
-	/** The good guess already done. */
-	private
-	/**
-	 * Checks if is good guess already done.
-	 *
-	 * @return true, if is good guess already done
-	 */
 	@Getter
-	/**
-	 * Sets the good guess already done.
-	 *
-	 * @param goodGuessAlreadyDone the new good guess already done
-	 */
-	@Setter boolean goodGuessAlreadyDone = false; // to check if user already guess the word
+	@Setter
+	/** The type of player : host/listener */
+	private String typeOfPlayer = null;
 
+	@Getter
+	@Setter
+	/** check if good guess has been already done by user. */
+	private boolean goodGuessAlreadyDone = false; 
+
+	@Getter
 	/** The points. */
-	private
-	/**
-	 * Gets the points.
-	 *
-	 * @return the points
-	 */
-	@Getter int points = 0;
+	private int points = 0;
 
 	/**
 	 * Instantiates a new pictionary player.
@@ -83,7 +60,7 @@ public class PictionaryPlayer implements Comparable<PictionaryPlayer> {
 	}
 
 	/**
-	 * Sub points.
+	 * Subtract points.
 	 *
 	 * @param points the points
 	 */
@@ -92,10 +69,10 @@ public class PictionaryPlayer implements Comparable<PictionaryPlayer> {
 	}
 
 	/**
-	 * Compare to.
+	 * Compare method based on players points
 	 *
 	 * @param player the player
-	 * @return the int
+	 * @return the int: 1 more points, -1 less points, 0 equally
 	 */
 	@Override
 	public int compareTo(PictionaryPlayer player) {

@@ -11,10 +11,7 @@ import pictionarySimplifiedClassesForTests.GameCommunicationTestServer;
 import pictionarySimplifiedClassesForTests.PictionaryTestClass;
 import server_side.pictionary.PictionaryRound;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class PictionaryRoundTest.
- */
+
 @RunWith(MockitoJUnitRunner.class)
 public class PictionaryRoundTest {
 

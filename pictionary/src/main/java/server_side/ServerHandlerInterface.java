@@ -1,22 +1,22 @@
 package server_side;
 
 import java.io.IOException;
-// TODO: Auto-generated Javadoc
+
 
 /**
- * The Interface ServerHandlerInterface.
+ * 	Server-Handler communication interface
  */
 public interface ServerHandlerInterface {
 	
 	/**
-	 * Checks if is test mode.
+	 * Checks if server is in test mode.
 	 *
 	 * @return true, if is test mode
 	 */
 	public boolean isTestMode();
 	
 	/**
-	 * Checks if is name taken.
+	 * Checks if is username is taken.
 	 *
 	 * @param userName the user name
 	 * @return true, if is name taken
@@ -41,6 +41,8 @@ public interface ServerHandlerInterface {
 	
 	/**
 	 * Send broadcast message.
+	 * 
+	 * Message is sent to each connected user
 	 *
 	 * @param senderUsername the sender username
 	 * @param message the message
@@ -56,10 +58,12 @@ public interface ServerHandlerInterface {
 	public void addUserToGame(String name);
 	
 	/**
-	 * Check word.
+	 * Check if word guessed by player is proper.
+	 * 
+	 * This method is used while game is running
 	 *
-	 * @param word the word
-	 * @param username the username
+	 * @param word the word guessed by player
+	 * @param username the username of guessing player
 	 */
 	public void checkWord(String word,String username);
 }
