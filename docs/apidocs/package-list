@@ -1,0 +1,6 @@
+client_side
+client_side.gui.model
+client_side.gui.view_controller
+protocol_parser
+server_side
+server_side.pictionary
