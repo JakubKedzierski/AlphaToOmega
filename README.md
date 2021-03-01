@@ -37,7 +37,7 @@ Project is created with:
 * Maven summary documentation: https://jakubkedzierski.github.io/Pictionary/summary.html
 
 ## Setup 
-# Release
+### Release
 Download and run project .jar files from release: https://github.com/JakubKedzierski/Pictionary/releases/tag/v1.0-beta
 
 Remember that you have to run firstly server:
@@ -55,7 +55,7 @@ Open new console and start 2. client
 $java -jar .\pictionaryClient.jar
 ```
 
-# Maven
+### Maven
 You can build projcet using Maven 3.6:
 
 ```
